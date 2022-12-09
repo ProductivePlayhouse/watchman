@@ -39,7 +39,7 @@ const reducer = (state, action) => {
 const initialState = {
   error: null,
   loading: false,
-  results: null
+  results: null,
 };
 
 const valuesOnlyContainLimit = R.pipe(
@@ -50,7 +50,7 @@ const valuesOnlyContainLimit = R.pipe(
 
 function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const executeSearch = async qs => {
+  const executeSearch = async (qs) => {
     dispatch({ type: "SEARCH_INIT" });
     try {
       const payload = await search(qs);
@@ -65,7 +65,7 @@ function App() {
     history.push({ ...history.location, search: "" });
   };
 
-  const handleSubmit = values => {
+  const handleSubmit = (values) => {
     if (valuesOnlyContainLimit(values)) return;
     const qs = buildQueryString(values);
     history.push({ ...history.location, search: qs });
@@ -80,12 +80,39 @@ function App() {
       `}
     >
       <Container>
-        <h1>Moov Watchman</h1>
-        <p>Moov Watchman is a service which downloads, parses and indexes numerous trade, government and non-profit lists of blocked individuals and entities to comply with those regions laws.</p>
+        <h1>PPH Watchman</h1>
         <p>
-          <a css={`color: #0000EE;`} href="https://github.com/moov-io/watchman">GitHub</a> |&nbsp;
-          <a css={`color: #0000EE;`} href="https://moov-io.github.io/watchman/">Documentation</a> |&nbsp;
-          <a css={`color: #0000EE;`} href="https://moov-io.github.io/watchman/api/">API Endpoints</a>
+          PPH Watchman is a service which downloads, parses and indexes numerous trade, government
+          and non-profit lists of blocked individuals and entities to comply with those regions
+          laws.
+        </p>
+        <p>
+          <a
+            css={`
+              color: #0000ee;
+            `}
+            href="https://github.com/moov-io/watchman"
+          >
+            GitHub
+          </a>{" "}
+          |&nbsp;
+          <a
+            css={`
+              color: #0000ee;
+            `}
+            href="https://moov-io.github.io/watchman/"
+          >
+            Documentation
+          </a>{" "}
+          |&nbsp;
+          <a
+            css={`
+              color: #0000ee;
+            `}
+            href="https://moov-io.github.io/watchman/api/"
+          >
+            API Endpoints
+          </a>
         </p>
       </Container>
       <Form onSubmit={handleSubmit} onReset={handleReset} />
