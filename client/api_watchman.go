@@ -1683,7 +1683,7 @@ func (a *WatchmanApiService) Search(ctx _context.Context, localVarOptionals *Sea
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
-	log.Printf("\nPPH DEBUG: Search called \n")
+	logger.Logf("PPH DEBUG: Search called")
 
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
@@ -1789,7 +1789,7 @@ func (a *WatchmanApiService) SearchUSCSL(ctx _context.Context, localVarOptionals
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
-	log.Printf("\nPPH DEBUG: SearchUSCSL called \n")
+	logger.Logf("PPH DEBUG: SearchUSCSL called")
 
 	return localVarReturnValue, localVarHTTPResponse, nil
 }

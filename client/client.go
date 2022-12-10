@@ -164,7 +164,6 @@ func (c *APIClient) callAPI(request *http.Request) (*http.Response, error) {
 		if err != nil {
 			return nil, err
 		}
-		log.Printf("\nDEBUG TEST: seeing if PPH changes show up in logs\n")
 		log.Printf("\n%s\n", string(dump))
 	}
 
@@ -177,12 +176,9 @@ func (c *APIClient) callAPI(request *http.Request) (*http.Response, error) {
 		dump, err := httputil.DumpResponse(resp, true)
 		if err != nil {
 			return resp, err
-		}
-		log.Printf("\nDEBUG TEST: seeing if PPH changes show up in logs\n")		
+		}	
 		log.Printf("\n%s\n", string(dump))
 	}
-
-	log.Printf("\nDEBUG TEST: seeing if PPH changes show up in logs\n")
 
 	return resp, err
 }
