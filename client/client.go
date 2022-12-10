@@ -182,6 +182,8 @@ func (c *APIClient) callAPI(request *http.Request) (*http.Response, error) {
 		log.Printf("\n%s\n", string(dump))
 	}
 
+	log.Printf("\nDEBUG TEST: seeing if PPH changes show up in logs\n")
+
 	return resp, err
 }
 
