@@ -58,6 +58,16 @@ func main() {
 		logger = log.NewDefaultLogger()
 	}
 
+	logger.Logf("Watchman server attempting to connect to DynamoDB table...")
+
+	// TODO
+	// // Establish connection to DynamoDB
+	// db, err := dynamo.NewDynamoDB(logger, os.Getenv("DYNAMO_ENDPOINT"), os.Getenv("DYNAMO_TABLE_NAME"))
+	// if err != nil {
+	// 	logger.LogErrorf("ERROR: failed to connect to DynamoDB: %v", err)
+	// 	os.Exit(1)
+	// }
+
 	logger.Logf("Starting watchman server version %s", watchman.Version)
 
 	// Channel for errors
@@ -235,9 +245,6 @@ func main() {
 		shutdownServer()
 		logger.LogErrorf("final exit: %v", err)
 	}
-
-	logger.Logf("Watchman server attempting to connect to DynamoDB table")
-	// TODO!
 }
 
 func addPingRoute(r *mux.Router) {
