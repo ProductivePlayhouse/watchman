@@ -27,6 +27,8 @@ import (
 	"github.com/moov-io/watchman/internal/database"
 
 	"github.com/gorilla/mux"
+
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
 var (
@@ -233,6 +235,9 @@ func main() {
 		shutdownServer()
 		logger.LogErrorf("final exit: %v", err)
 	}
+
+	logger.Logf("Watchman server attempting to connect to DynamoDB table")
+	// TODO!
 }
 
 func addPingRoute(r *mux.Router) {
