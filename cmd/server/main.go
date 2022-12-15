@@ -72,9 +72,7 @@ func main() {
 	logger.Logf("Watchman server attempting to connect to DynamoDB table...")
 
 	scenarioMap := map[string]func(sdkConfig aws.Config){
-		"movieTable":    runMovieScenario,
-		"partiQLSingle": runPartiQLSingleScenario,
-		"partiQLBatch":  runPartiQLBatchScenario,
+		"movieTable":    runMovieScenario
 	}
 	choices := make([]string, len(scenarioMap))
 	choiceIndex := 0
@@ -328,4 +326,13 @@ func handleDownloadStats(updates chan *DownloadStats, handle func(stats *Downloa
 			handle(stats)
 		}
 	}
+}
+
+func runMovieScenario(sdkConfig aws.Config) {
+	scenarios.RunMovieScenario(
+		sdkConfig,
+		demotools.NewQuestioner(),
+		"doc-example-movie-table",
+		actions.MovieSampler{URL: "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/samples/moviedata.zip"},
+	)
 }
