@@ -28,8 +28,6 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"log"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/awsdocs/aws-doc-sdk-examples/gov2/demotools"
