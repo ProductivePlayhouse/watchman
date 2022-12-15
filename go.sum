@@ -169,6 +169,10 @@ github.com/aws/aws-sdk-go-v2/credentials v1.3.2/go.mod h1:PACKuTJdt6AlXvEq8rFI4e
 github.com/aws/aws-sdk-go-v2/credentials v1.4.3/go.mod h1:FNNC6nQZQUuyhq5aE5c7ata8o9e4ECGmS4lAXC7o1mQ=
 github.com/aws/aws-sdk-go-v2/credentials v1.13.4 h1:nEbHIyJy7mCvQ/kzGG7VWHSBpRB4H6sJy3bWierWUtg=
 github.com/aws/aws-sdk-go-v2/credentials v1.13.4/go.mod h1:/Cj5w9LRsNTLSwexsohwDME32OzJ6U81Zs33zr2ZWOM=
+github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.10.7 h1:CyuByiiCA4lPfU8RaHJh2wIYYn0hkFlOkMfWkVY67Mc=
+github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.10.7/go.mod h1:pAMtgCPVxcKohC/HNI6nLwLeW007eYl3T+pq7yTMV3o=
+github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression v1.4.33 h1:1mqqCPLHzo8jp2thUDK1qLnZmvRWSvglr1kiTNfpE/0=
+github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression v1.4.33/go.mod h1:RTCFYkh3FxYNPxSSfHpmFwEZ4+G0WOB6lLquxh02Ks0=
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.4.0/go.mod h1:Mj/U8OpDbcVcoctrYwA2bak8k/HFPdcLzI/vaiXMwuM=
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.6.0/go.mod h1:gqlclDEZp4aqJOancXK6TN24aKhT0W0Ae9MHk3wzTMM=
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.20 h1:tpNOglTZ8kg9T38NpcGBxudqfUAwUzyUnLQ4XSd0CHE=
@@ -186,6 +190,8 @@ github.com/aws/aws-sdk-go-v2/internal/ini v1.3.27/go.mod h1:RdwFVc7PBYWY33fa2+8T
 github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.8.1/go.mod h1:CM+19rL1+4dFWnOQKwDc7H1KwXTz+h61oUSHyhV0b3o=
 github.com/aws/aws-sdk-go-v2/service/dynamodb v1.17.8 h1:VgdGaSIoH4JhUZIspT8UgK0aBF85TiLve7VHEx3NfqE=
 github.com/aws/aws-sdk-go-v2/service/dynamodb v1.17.8/go.mod h1:jvXzk+hVrlkiQOvnq6jH+F6qBK0CEceXkEWugT+4Kdc=
+github.com/aws/aws-sdk-go-v2/service/dynamodbstreams v1.13.27 h1:7MhqbR+k+b0gbOxp+W8yXgsl/Z5/dtMh85K0WI8X2EA=
+github.com/aws/aws-sdk-go-v2/service/dynamodbstreams v1.13.27/go.mod h1:wX9QEZJ8Dw1fdAKCOAUmSvAe3wNJFxnE/4AeYc8blGA=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.2.2/go.mod h1:EASdTcM1lGhUe1/p4gkojHwlGJkeoRjjr1sRCzup3Is=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.3.0/go.mod h1:v8ygadNyATSm6elwJ/4gzJwcFhri9RqS8skgHKiwXPU=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.11 h1:y2+VQzC6Zh2ojtV2LoC0MNwHWc6qXv/j2vrQtlftkdA=
@@ -214,6 +220,10 @@ github.com/aws/smithy-go v1.7.0/go.mod h1:SObp3lf9smib00L/v3U2eAKG8FyQ7iLrJnQiAm
 github.com/aws/smithy-go v1.8.0/go.mod h1:SObp3lf9smib00L/v3U2eAKG8FyQ7iLrJnQiAmR5n+E=
 github.com/aws/smithy-go v1.13.5 h1:hgz0X/DX0dGqTYpGALqXJoRKRj5oQ7150i5FdTePzO8=
 github.com/aws/smithy-go v1.13.5/go.mod h1:Tg+OJXh4MB2R/uN61Ko2f6hTZwB/ZYGOtib8J3gBHzA=
+github.com/awsdocs/aws-doc-sdk-examples/gov2/demotools v0.0.0-20221214215752-f26f7874b6e8 h1:17IjzQzVpNjCv0766BCTDFdLwZdlYeqxFiLbFFXW/N4=
+github.com/awsdocs/aws-doc-sdk-examples/gov2/demotools v0.0.0-20221214215752-f26f7874b6e8/go.mod h1:0r22nlw0YYkUMowQkNluzs2dc8kf6s2bg9Oema9TzlE=
+github.com/awsdocs/aws-doc-sdk-examples/gov2/testtools v0.0.0-20221214215752-f26f7874b6e8 h1:pfpP7Pga0C/0uzDGCDOrZkYi2xje/sSUQses5Am5eN8=
+github.com/awsdocs/aws-doc-sdk-examples/gov2/testtools v0.0.0-20221214215752-f26f7874b6e8/go.mod h1:qcs782jWmSQW2exwfKW39rOvOJBZ4xzO8dVLoFF62Sc=
 github.com/bbalet/stopwords v1.0.0 h1:0TnGycCtY0zZi4ltKoOGRFIlZHv0WqpoIGUsObjztfo=
 github.com/bbalet/stopwords v1.0.0/go.mod h1:sAWrQoDMfqARGIn4s6dp7OW7ISrshUD8IP2q3KoqPjc=
 github.com/benbjohnson/clock v1.0.3/go.mod h1:bGMdMPoPVvcYyt1gHDf4J2KE153Yf9BuiUKYMaxlTDM=
