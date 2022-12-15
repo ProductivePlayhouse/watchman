@@ -12,8 +12,7 @@ RUN npm install --legacy-peer-deps
 RUN npm run build
 
 FROM debian:stable-slim
-LABEL maintainer="Moov <oss@moov.io>"
-
+ENV AWS_REGION=us-west-2
 RUN apt-get update && apt-get upgrade -y && apt-get install -y ca-certificates
 COPY --from=backend /go/src/github.com/moov-io/watchman/bin/server /bin/server
 

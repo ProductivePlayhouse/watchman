@@ -220,8 +220,12 @@ github.com/aws/smithy-go v1.7.0/go.mod h1:SObp3lf9smib00L/v3U2eAKG8FyQ7iLrJnQiAm
 github.com/aws/smithy-go v1.8.0/go.mod h1:SObp3lf9smib00L/v3U2eAKG8FyQ7iLrJnQiAmR5n+E=
 github.com/aws/smithy-go v1.13.5 h1:hgz0X/DX0dGqTYpGALqXJoRKRj5oQ7150i5FdTePzO8=
 github.com/aws/smithy-go v1.13.5/go.mod h1:Tg+OJXh4MB2R/uN61Ko2f6hTZwB/ZYGOtib8J3gBHzA=
+github.com/awsdocs/aws-doc-sdk-examples/gov2/demotools v0.0.0-20220706224858-5c7f475624dc h1:GXIhJ+DrwX3Jy97Tvr0RsMSWa71jkZMHEJA906F/dMs=
+github.com/awsdocs/aws-doc-sdk-examples/gov2/demotools v0.0.0-20220706224858-5c7f475624dc/go.mod h1:0r22nlw0YYkUMowQkNluzs2dc8kf6s2bg9Oema9TzlE=
 github.com/awsdocs/aws-doc-sdk-examples/gov2/demotools v0.0.0-20221214215752-f26f7874b6e8 h1:17IjzQzVpNjCv0766BCTDFdLwZdlYeqxFiLbFFXW/N4=
 github.com/awsdocs/aws-doc-sdk-examples/gov2/demotools v0.0.0-20221214215752-f26f7874b6e8/go.mod h1:0r22nlw0YYkUMowQkNluzs2dc8kf6s2bg9Oema9TzlE=
+github.com/awsdocs/aws-doc-sdk-examples/gov2/dynamodb v0.0.0-20221214215752-f26f7874b6e8 h1:RrHF+k5JGE3xPFuyxfG++25rS+qgRBS92A96p8Q2tTQ=
+github.com/awsdocs/aws-doc-sdk-examples/gov2/dynamodb v0.0.0-20221214215752-f26f7874b6e8/go.mod h1:FMOldnA5ea/UxyhAdUhCrSzoxnvdv/vb3yhaOvhigL4=
 github.com/awsdocs/aws-doc-sdk-examples/gov2/testtools v0.0.0-20221214215752-f26f7874b6e8 h1:pfpP7Pga0C/0uzDGCDOrZkYi2xje/sSUQses5Am5eN8=
 github.com/awsdocs/aws-doc-sdk-examples/gov2/testtools v0.0.0-20221214215752-f26f7874b6e8/go.mod h1:qcs782jWmSQW2exwfKW39rOvOJBZ4xzO8dVLoFF62Sc=
 github.com/bbalet/stopwords v1.0.0 h1:0TnGycCtY0zZi4ltKoOGRFIlZHv0WqpoIGUsObjztfo=

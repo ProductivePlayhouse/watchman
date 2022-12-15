@@ -5,6 +5,10 @@ go 1.19
 require (
 	github.com/abadojack/whatlanggo v1.0.1
 	github.com/antihax/optional v1.0.0
+	github.com/aws/aws-sdk-go-v2 v1.17.2
+	github.com/aws/aws-sdk-go-v2/config v1.18.4
+	github.com/awsdocs/aws-doc-sdk-examples/gov2/demotools v0.0.0-20220706224858-5c7f475624dc
+	github.com/awsdocs/aws-doc-sdk-examples/gov2/dynamodb v0.0.0-20221214215752-f26f7874b6e8
 	github.com/bbalet/stopwords v1.0.0
 	github.com/docker/docker v20.10.13+incompatible
 	github.com/go-kit/kit v0.12.0
@@ -23,8 +27,6 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.17.2 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.18.4 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.4 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.10.7 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression v1.4.33 // indirect
@@ -41,8 +43,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.13.9 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.17.6 // indirect
 	github.com/aws/smithy-go v1.13.5 // indirect
-	github.com/awsdocs/aws-doc-sdk-examples/gov2/demotools v0.0.0-20221214215752-f26f7874b6e8 // indirect
-	github.com/awsdocs/aws-doc-sdk-examples/gov2/testtools v0.0.0-20221214215752-f26f7874b6e8 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
