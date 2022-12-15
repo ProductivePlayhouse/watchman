@@ -72,7 +72,7 @@ func main() {
 	logger.Logf("Watchman server attempting to connect to DynamoDB table...")
 
 	scenarioMap := map[string]func(sdkConfig aws.Config){
-		"movieTable":    runMovieScenario
+		"movieTable": runMovieScenario,
 	}
 	choices := make([]string, len(scenarioMap))
 	choiceIndex := 0
