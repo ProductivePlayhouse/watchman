@@ -14,7 +14,7 @@ else
 endif
 
 build-server:
-	CGO_ENABLED=1 go build -o ./bin/server github.com/moov-io/watchman/cmd/server
+	CGO_ENABLED=1 go build -o ./bin/server ./cmd/server
 
 build-batchsearch:
 	CGO_ENABLED=0 go build -o ./bin/batchsearch github.com/moov-io/watchman/cmd/batchsearch
