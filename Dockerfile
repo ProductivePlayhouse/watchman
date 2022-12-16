@@ -21,4 +21,4 @@ ENV WEB_ROOT=/watchman/
 
 EXPOSE 8080
 EXPOSE 9090
-ENTRYPOINT ["/bin/server", "-scenario", "movieTable"]
+ENTRYPOINT ["/bin/server"]
