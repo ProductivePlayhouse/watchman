@@ -10,9 +10,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.10.7
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression v1.4.33
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.17.8
-	github.com/awsdocs/aws-doc-sdk-examples/gov2/demotools v0.0.0-20221214215752-f26f7874b6e8
-	github.com/awsdocs/aws-doc-sdk-examples/gov2/dynamodb v0.0.0-20221214215752-f26f7874b6e8
-	github.com/awsdocs/aws-doc-sdk-examples/gov2/testtools v0.0.0-20221214215752-f26f7874b6e8
 	github.com/bbalet/stopwords v1.0.0
 	github.com/docker/docker v20.10.13+incompatible
 	github.com/go-kit/kit v0.12.0
