@@ -65,84 +65,87 @@ func main() {
 	logger.Logf(strings.Repeat("-", 88))
 	logger.Logf("Watchman server attempting to connect to DynamoDB table...")
 
-	scenarioMap := map[string]func(sdkConfig aws.Config){
-		"movieTable": runMovieScenario,
-	}
-	choices := make([]string, len(scenarioMap))
-	choiceIndex := 0
-	for choice := range scenarioMap {
-		choices[choiceIndex] = choice
-		choiceIndex++
-	}
-	scenario := flag.String(
-		"scenario", "",
-		fmt.Sprintf("The scenario to run. Must be one of %v.", choices))
-	flag.Parse()
-
-	if runScenario, ok := scenarioMap[*scenario]; !ok {
-		fmt.Printf("'%v' is not a valid scenario.\n", *scenario)
-		flag.Usage()
-	} else {
-		sdkConfig, err := config.LoadDefaultConfig(context.TODO())
+	sdkConfig, err := config.LoadDefaultConfig(context.TODO())
 		if err != nil {
-			logger.Logf("unable to load SDK config, %v", err)
+			log.Fatalf("unable to load SDK config, %v", err)
 		}
-		runScenario(sdkConfig)
-	}
-}
+	tableName string = "doc-example-movie-table"
 
-func addPingRoute(r *mux.Router) {
-	r.Methods("GET").Path("/ping").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		moovhttp.SetAccessControlAllowHeaders(w, r.Header.Get("Origin"))
-		w.Header().Set("Content-Type", "text/plain")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("PONG"))
-	})
-}
-
-// getDataRefreshInterval returns a time.Duration for how often OFAC should refresh data
-//
-// env is the value from an environmental variable
-func getDataRefreshInterval(logger log.Logger, env string) time.Duration {
-	if env != "" {
-		if strings.EqualFold(env, "off") {
-			return 0 * time.Second
+	movieSampler actions.IMovieSampler = actions.MovieSampler{URL: "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/samples/moviedata.zip"},
+	
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Printf("Something went wrong with the demo.")
 		}
-		if dur, _ := time.ParseDuration(env); dur > 0 {
-			logger.Logf("Setting data refresh interval to %v", dur)
-			return dur
+	}()
+
+	log.Println(strings.Repeat("-", 88))
+	log.Println("Welcome to the Amazon DynamoDB getting started demo.")
+	log.Println(strings.Repeat("-", 88))
+
+	tableBasics := actions.TableBasics{TableName: tableName,
+		DynamoDbClient: dynamodb.NewFromConfig(sdkConfig)}
+
+	exists, err := tableBasics.TableExists()
+	if err != nil {
+		panic(err)
+	}
+	if !exists {
+		log.Printf("Creating table %v...\n", tableName)
+		_, err = tableBasics.CreateMovieTable()
+		if err != nil {
+			panic(err)
+		} else {
+			log.Printf("Created table %v.\n", tableName)
 		}
-	}
-	logger.Logf("Setting data refresh interval to %v (default)", dataRefreshInterval)
-	return dataRefreshInterval
-}
-
-func setupWebui(logger log.Logger, r *mux.Router, basePath string) {
-	dir := os.Getenv("WEB_ROOT")
-	if dir == "" {
-		dir = filepath.Join("webui", "build")
-	}
-	if _, err := os.Stat(dir); err != nil {
-		logger.Logf("problem with webui=%s: %v", dir, err)
-		os.Exit(1)
-	}
-	r.PathPrefix("/").Handler(http.StripPrefix(basePath, http.FileServer(http.Dir(dir))))
-}
-
-func handleDownloadStats(updates chan *DownloadStats, handle func(stats *DownloadStats)) {
-	for {
-		stats := <-updates
-		if stats != nil {
-			handle(stats)
-		}
+	} else {
+		log.Printf("Table %v already exists.\n", tableName)
 	}
 }
 
-func runMovieScenario(sdkConfig aws.Config) {
-	scenarios.RunMovieScenario(
-		sdkConfig,
-		demotools.NewQuestioner(),
-		"doc-example-movie-table",
-		actions.MovieSampler{URL: "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/samples/moviedata.zip"},
-	)
-}
+// func addPingRoute(r *mux.Router) {
+// 	r.Methods("GET").Path("/ping").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		moovhttp.SetAccessControlAllowHeaders(w, r.Header.Get("Origin"))
+// 		w.Header().Set("Content-Type", "text/plain")
+// 		w.WriteHeader(http.StatusOK)
+// 		w.Write([]byte("PONG"))
+// 	})
+// }
+
+// // getDataRefreshInterval returns a time.Duration for how often OFAC should refresh data
+// //
+// // env is the value from an environmental variable
+// func getDataRefreshInterval(logger log.Logger, env string) time.Duration {
+// 	if env != "" {
+// 		if strings.EqualFold(env, "off") {
+// 			return 0 * time.Second
+// 		}
+// 		if dur, _ := time.ParseDuration(env); dur > 0 {
+// 			logger.Logf("Setting data refresh interval to %v", dur)
+// 			return dur
+// 		}
+// 	}
+// 	logger.Logf("Setting data refresh interval to %v (default)", dataRefreshInterval)
+// 	return dataRefreshInterval
+// }
+
+// func setupWebui(logger log.Logger, r *mux.Router, basePath string) {
+// 	dir := os.Getenv("WEB_ROOT")
+// 	if dir == "" {
+// 		dir = filepath.Join("webui", "build")
+// 	}
+// 	if _, err := os.Stat(dir); err != nil {
+// 		logger.Logf("problem with webui=%s: %v", dir, err)
+// 		os.Exit(1)
+// 	}
+// 	r.PathPrefix("/").Handler(http.StripPrefix(basePath, http.FileServer(http.Dir(dir))))
+// }
+
+// func handleDownloadStats(updates chan *DownloadStats, handle func(stats *DownloadStats)) {
+// 	for {
+// 		stats := <-updates
+// 		if stats != nil {
+// 			handle(stats)
+// 		}
+// 	}
+// }
