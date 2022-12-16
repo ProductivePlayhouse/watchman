@@ -4,7 +4,7 @@ VERSION := $(shell grep -Eo '(v[0-9]+[\.][0-9]+[\.][0-9]+(-[a-zA-Z0-9]*)?)' vers
 .PHONY: run build build-server build-examples docker release check test
 
 run:
-	CGO_ENABLED=1 go run github.com/moov-io/watchman/cmd/server
+	CGO_ENABLED=1 go run ./cmd/server
 
 build: build-server build-batchsearch build-watchmantest build-examples
 ifeq ($(OS),Windows_NT)
@@ -17,15 +17,15 @@ build-server:
 	CGO_ENABLED=1 go build -o ./bin/server ./cmd/server
 
 build-batchsearch:
-	CGO_ENABLED=0 go build -o ./bin/batchsearch github.com/moov-io/watchman/cmd/batchsearch
+	CGO_ENABLED=0 go build -o ./bin/batchsearch ./cmd/batchsearch
 
 build-watchmantest:
-	CGO_ENABLED=0 go build -o ./bin/watchmantest github.com/moov-io/watchman/cmd/watchmantest
+	CGO_ENABLED=0 go build -o ./bin/watchmantest ./cmd/watchmantest
 
 build-examples: build-webhook-example
 
 build-webhook-example:
-	CGO_ENABLED=0 go build -o ./bin/webhook-example github.com/moov-io/watchman/examples/webhook
+	CGO_ENABLED=0 go build -o ./bin/webhook-example ./examples/webhook
 
 .PHONY: check
 check:
@@ -45,7 +45,7 @@ admin:
 		-v ${PWD}:/local openapitools/openapi-generator-cli:v4.3.1 batch -- /local/.openapi-generator/admin-generator-config.yml
 	rm -f ./admin/go.mod ./admin/go.sum ./admin/.travis.yml
 	gofmt -w ./admin/
-	go build github.com/moov-io/watchman/admin
+	go build ./admin
 
 .PHONY: client
 client:
@@ -55,7 +55,7 @@ client:
 		-v ${PWD}:/local openapitools/openapi-generator-cli:v4.3.1 batch -- /local/.openapi-generator/client-generator-config.yml
 	rm -f ./client/go.mod ./client/go.sum ./client/.travis.yml
 	gofmt -w ./client/
-	go build github.com/moov-io/watchman/client
+	go build ./client
 
 
 .PHONY: clean
@@ -68,9 +68,9 @@ endif
 
 dist: clean build
 ifeq ($(OS),Windows_NT)
-	CGO_ENABLED=1 GOOS=windows go build -o bin/watchman.exe github.com/moov-io/watchman/cmd/server
+	CGO_ENABLED=1 GOOS=windows go build -o bin/watchman.exe ./cmd/server
 else
-	CGO_ENABLED=1 GOOS=$(PLATFORM) go build -o bin/watchman-$(PLATFORM)-amd64 github.com/moov-io/watchman/cmd/server
+	CGO_ENABLED=1 GOOS=$(PLATFORM) go build -o bin/watchman-$(PLATFORM)-amd64 ./cmd/server
 endif
 
 docker: clean docker-hub docker-openshift docker-static docker-watchmantest docker-webhook
