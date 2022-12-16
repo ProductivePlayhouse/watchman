@@ -1,4 +1,4 @@
-module github.com/moov-io/watchman
+module watchman
 
 go 1.19
 
