@@ -90,8 +90,7 @@ func main() {
 		runScenario(sdkConfig)
 	}
 
-	if false
-	{
+	if false{
 		logger.Logf("Starting watchman server version %s", watchman.Version)
 
 		// Channel for errors
