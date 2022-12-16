@@ -19,8 +19,6 @@ COPY --from=backend /go/src/github.com/moov-io/watchman/bin/server /bin/server
 COPY --from=frontend /watchman/build/ /watchman/
 ENV WEB_ROOT=/watchman/
 
-# USER moov # TODO(adam): non-root users
-
 EXPOSE 8080
 EXPOSE 9090
 ENTRYPOINT ["/bin/server"]

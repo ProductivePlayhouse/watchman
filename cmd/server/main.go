@@ -89,10 +89,8 @@ func main() {
 	} else {
 		sdkConfig, err := config.LoadDefaultConfig(context.TODO())
 		if err != nil {
-			log.Fatalf("unable to load SDK config, %v", err)
+			logger.Logf("unable to load SDK config, %v", err)
 		}
-
-		log.SetFlags(0)
 		runScenario(sdkConfig)
 	}
 
