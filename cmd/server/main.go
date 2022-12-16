@@ -6,33 +6,32 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
+	// "crypto/tls"
 	"flag"
-	"fmt"
-	"net/http"
+	// "fmt"
+	// "net/http"
 	"os"
-	"os/signal"
-	"path/filepath"
+	// "os/signal"
+	// "path/filepath"
 	"runtime"
-	"strconv"
+	// "strconv"
 	"strings"
-	"syscall"
+	// "syscall"
 	"time"
 
-	"github.com/moov-io/base/admin"
-	moovhttp "github.com/moov-io/base/http"
+	// "github.com/moov-io/base/admin"
+	// moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/http/bind"
 	"github.com/moov-io/base/log"
-	"github.com/moov-io/watchman"
-	"github.com/moov-io/watchman/internal/database"
+	// "github.com/moov-io/watchman"
+	"github.com/moov-io/watchman/actions"	
+	// "github.com/moov-io/watchman/internal/database"
 
-	"github.com/gorilla/mux"
+	// "github.com/gorilla/mux"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
+	// "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	// "github.com/awsdocs/aws-doc-sdk-examples/gov2/demotools"
-	// "github.com/awsdocs/aws-doc-sdk-examples/gov2/dynamodb/actions"
-	// "github.com/awsdocs/aws-doc-sdk-examples/gov2/dynamodb/scenarios"	
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 )
 
 var (
@@ -67,21 +66,13 @@ func main() {
 
 	sdkConfig, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
-		log.Fatalf("unable to load SDK config, %v", err)
+		logger.Logf("unable to load SDK config, %v", err)
 	}
-	tableName string = "doc-example-movie-table"
-
-	movieSampler actions.IMovieSampler = actions.MovieSampler{URL: "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/samples/moviedata.zip"},
+	tableName := "doc-example-movie-table"
 	
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Printf("Something went wrong with the demo.")
-		}
-	}()
-
-	log.Println(strings.Repeat("-", 88))
-	log.Println("Welcome to the Amazon DynamoDB getting started demo.")
-	log.Println(strings.Repeat("-", 88))
+	logger.Logf(strings.Repeat("-", 88))
+	logger.Logf("Welcome to the Amazon DynamoDB getting started demo.")
+	logger.Logf(strings.Repeat("-", 88))
 
 	tableBasics := actions.TableBasics{TableName: tableName,
 		DynamoDbClient: dynamodb.NewFromConfig(sdkConfig)}
@@ -91,15 +82,15 @@ func main() {
 		panic(err)
 	}
 	if !exists {
-		log.Printf("Creating table %v...\n", tableName)
+		logger.Logf("Creating table %v...\n", tableName)
 		_, err = tableBasics.CreateMovieTable()
 		if err != nil {
 			panic(err)
 		} else {
-			log.Printf("Created table %v.\n", tableName)
+			logger.Logf("Created table %v.\n", tableName)
 		}
 	} else {
-		log.Printf("Table %v already exists.\n", tableName)
+		logger.Logf("Table %v already exists.\n", tableName)
 	}
 }
 
