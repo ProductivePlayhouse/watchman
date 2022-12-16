@@ -66,9 +66,9 @@ func main() {
 	logger.Logf("Watchman server attempting to connect to DynamoDB table...")
 
 	sdkConfig, err := config.LoadDefaultConfig(context.TODO())
-		if err != nil {
-			log.Fatalf("unable to load SDK config, %v", err)
-		}
+	if err != nil {
+		log.Fatalf("unable to load SDK config, %v", err)
+	}
 	tableName string = "doc-example-movie-table"
 
 	movieSampler actions.IMovieSampler = actions.MovieSampler{URL: "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/samples/moviedata.zip"},
