@@ -61,14 +61,13 @@ func main() {
 		logger = log.NewDefaultLogger()
 	}
 
-	logger.Logf(strings.Repeat("-", 88))
-	logger.Logf("Watchman server attempting to connect to DynamoDB table...")
+	// BEGIN DYNAMODB SECTION
 
 	sdkConfig, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		logger.Logf("unable to load SDK config, %v", err)
 	}
-	tableName := "doc-example-movie-table"
+	tableName := "watchman-queries"
 	
 	logger.Logf(strings.Repeat("-", 88))
 	logger.Logf("Welcome to the Amazon DynamoDB getting started demo.")
@@ -92,6 +91,8 @@ func main() {
 	} else {
 		logger.Logf("Table %v already exists.\n", tableName)
 	}
+
+	// END DYNAMODB SECTION	
 }
 
 // func addPingRoute(r *mux.Router) {
