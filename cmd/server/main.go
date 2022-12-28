@@ -69,10 +69,6 @@ func main() {
 	}
 	tableName := "watchman-queries"
 	
-	logger.Logf(strings.Repeat("-", 88))
-	logger.Logf("Welcome to the Amazon DynamoDB getting started demo.")
-	logger.Logf(strings.Repeat("-", 88))
-
 	tableBasics := actions.TableBasics{TableName: tableName,
 		DynamoDbClient: dynamodb.NewFromConfig(sdkConfig)}
 
