@@ -95,31 +95,21 @@ func (basics TableBasics) TableExists() (bool, error) {
 // }
 
 // CreateQueryTable creates a DynamoDB table with a composite primary key defined as
-// a string sort key named `query`, and a numeric partition key named `datetime`.
+// a string sort key named `datetime`, and a numeric partition key named `query`.
 // This function uses NewTableExistsWaiter to wait for the table to be created by
 // DynamoDB before it returns.
 func (basics TableBasics) CreateQueryTable() (*types.TableDescription, error) {
 	var tableDesc *types.TableDescription
 	table, err := basics.DynamoDbClient.CreateTable(context.TODO(), &dynamodb.CreateTableInput{
 		AttributeDefinitions: []types.AttributeDefinition{{
-			AttributeName: aws.String("datetime"),
-			AttributeType: types.ScalarAttributeTypeN,
-		}, {
 			AttributeName: aws.String("query"),
 			AttributeType: types.ScalarAttributeTypeS,
-		}},
-		KeySchema: []types.KeySchemaElement{{
-			AttributeName: aws.String("datetime"),
-			KeyType:       types.KeyTypeHash,
 		}, {
-			AttributeName: aws.String("query"),
-			KeyType:       types.KeyTypeRange,
+			AttributeName: aws.String("datetime"),
+			AttributeType: types.ScalarAttributeTypeN,
 		}},
 		TableName: aws.String(basics.TableName),
-		ProvisionedThroughput: &types.ProvisionedThroughput{
-			ReadCapacityUnits:  aws.Int64(5),
-			WriteCapacityUnits: aws.Int64(5),
-		},
+		BillingMode: types.BillingModePayPerRequest,
 	})
 	if err != nil {
 		log.Printf("Couldn't create table %v. Here's why: %v\n", basics.TableName, err)
