@@ -165,7 +165,7 @@ func (basics TableBasics) AddQuery(queryResponse QueryResponse) error {
 	if err != nil {
 		log.Printf("Couldn't add item to table. Here's why: %v\n", err)
 	}
-	return
+	return err
 }
 
 // // AddMovie adds a movie the DynamoDB table.
