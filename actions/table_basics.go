@@ -117,8 +117,8 @@ func (basics TableBasics) CreateQueryTable() (*types.TableDescription, error) {
 		}},
 		TableName: aws.String(basics.TableName),
 		ProvisionedThroughput: &types.ProvisionedThroughput{
-			ReadCapacityUnits:  aws.Int64(10),
-			WriteCapacityUnits: aws.Int64(10),
+			ReadCapacityUnits:  aws.Int64(5),
+			WriteCapacityUnits: aws.Int64(5),
 		},
 	})
 	if err != nil {
