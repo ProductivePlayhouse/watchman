@@ -46,6 +46,9 @@ var (
 	dataRefreshInterval = 12 * time.Hour
 )
 
+
+
+
 func main() {
 	flag.Parse()
 
@@ -87,6 +90,53 @@ func main() {
 	} else {
 		logger.Logf("Table %v already exists.\n", tableName)
 	}
+
+	// Create an instance of the type:
+	// type QueryResponse struct {
+	// 	Query						     string   `dynamodbav:"query"`
+	// 	SDNs                             []string `dynamodbav:"SDNs"`
+	// 	AltNames                         []string `dynamodbav:"altNames"`
+	// 	Addresses                        string   `dynamodbav:"addresses"`
+	// 	DeniedPersons                    []string `dynamodbav:"deniedPersons"`
+	// 	BisEntities                      []string `dynamodbav:"bisEntities"`
+	// 	MilitaryEndUsers                 string   `dynamodbav:"militaryEndUsers"`
+	// 	SectoralSanctions                []string `dynamodbav:"sectoralSanctions"`
+	// 	UnverifiedCSL                    string   `dynamodbav:"unverifiedCSL"`
+	// 	NonproliferationSanctions        string   `dynamodbav:"nonproliferationSanctions"`
+	// 	ForeignSanctionsEvaders          string   `dynamodbav:"foreignSanctionsEvaders"`
+	// 	PalestinianLegislativeCouncil    string   `dynamodbav:"palestinianLegislativeCouncil"`
+	// 	CaptaList                        string   `dynamodbav:"captaList"`
+	// 	ItarDebarred                     string   `dynamodbav:"itarDebarred"`
+	// 	NonSDNChineseMilitaryIndustrial  string   `dynamodbav:"nonSDNChineseMilitaryIndustrialComplex"`
+	// 	NonSDNMenuBasedSanctionsList     string   `dynamodbav:"nonSDNMenuBasedSanctionsList"`
+	// 	EuConsolidatedSanctionsList      []string `dynamodbav:"euConsolidatedSanctionsList"`
+	// 	UkConsolidatedSanctionsList      []string `dynamodbav:"ukConsolidatedSanctionsList"`
+	// 	RefreshedAt                      string   `dynamodbav:"refreshedAt"`
+	// }
+	exampleResponse := actions.QueryResponse{
+		Query: "testQuery",
+		SDNs: []string{"testSDN1", "testSDN2"},
+		AltNames: []string{"testAltName1", "testAltName2"},
+		Addresses: "testAddress",
+		DeniedPersons: []string{"testDeniedPerson1", "testDeniedPerson2"},
+		BisEntities: []string{"testBisEntity1", "testBisEntity2"},
+		MilitaryEndUsers: "testMilitaryEndUser",
+		SectoralSanctions: []string{"testSectoralSanction1", "testSectoralSanction2"},
+		UnverifiedCSL: "testUnverifiedCSL",
+		NonproliferationSanctions: "testNonproliferationSanctions",
+		ForeignSanctionsEvaders: "testForeignSanctionsEvaders",
+		PalestinianLegislativeCouncil: "testPalestinianLegislativeCouncil",
+		CaptaList: "testCaptaList",
+		ItarDebarred: "testItarDebarred",
+		NonSDNChineseMilitaryIndustrial: "testNonSDNChineseMilitaryIndustrial",
+		NonSDNMenuBasedSanctionsList: "testNonSDNMenuBasedSanctionsList",
+		EuConsolidatedSanctionsList: []string{"testEuConsolidatedSanctionsList1", "testEuConsolidatedSanctionsList2"},
+		UkConsolidatedSanctionsList: []string{"testUkConsolidatedSanctionsList1", "testUkConsolidatedSanctionsList2"},
+		RefreshedAt: "12/28/2022 15:04:05",
+	}	
+
+	// Use tableBasics.AddQuery to add exampleResponse to the table
+    tableBasics.AddQuery(exampleResponse)
 
 	// END DYNAMODB SECTION	
 

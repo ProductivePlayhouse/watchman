@@ -25,6 +25,85 @@ type Movie struct {
 	Info  map[string]interface{} `dynamodbav:"info"`
 }
 
+// Create a type struct with the following data types
+// 	"SDNs": {
+// 		L: []*dynamodb.AttributeValue{},
+// 	},
+// 	"altNames": {
+// 		L: []*dynamodb.AttributeValue{},
+// 	},
+// 	"addresses": {
+// 		NULL: true,
+// 	},
+// 	"deniedPersons": {
+// 		L: []*dynamodb.AttributeValue{},
+// 	},
+// 	"bisEntities": {
+// 		L: []*dynamodb.AttributeValue{},
+// 	},
+// 	"militaryEndUsers": {
+// 		NULL: true,
+// 	},
+// 	"sectoralSanctions": {
+// 		L: []*dynamodb.AttributeValue{},
+// 	},
+// 	"unverifiedCSL": {
+// 		NULL: true,
+// 	},
+// 	"nonproliferationSanctions": {
+// 		NULL: true,
+// 	},
+// 	"foreignSanctionsEvaders": {
+// 		NULL: true,
+// 	},
+// 	"palestinianLegislativeCouncil": {
+// 		NULL: true,
+// 	},
+// 	"captaList": {
+// 		NULL: true,
+// 	},
+// 	"itarDebarred": {
+// 		NULL: true,
+// 	},
+// 	"nonSDNChineseMilitaryIndustrialComplex": {
+// 		NULL: true,
+// 	},
+// 	"nonSDNMenuBasedSanctionsList": {
+// 		NULL: true,
+// 	},
+// 	"euConsolidatedSanctionsList": {
+// 		L: []*dynamodb.AttributeValue{},
+// 	},
+// 	"ukConsolidatedSanctionsList": {
+// 		L: []*dynamodb.AttributeValue{},
+// 	},
+// 	"refreshedAt": {
+// 		S: "2022-12-27T21:34:37.812466469Z",
+// 	},
+type QueryResponse struct {
+	Query						     string   `dynamodbav:"query"`
+	SDNs                             []string `dynamodbav:"SDNs"`
+	AltNames                         []string `dynamodbav:"altNames"`
+	Addresses                        string   `dynamodbav:"addresses"`
+	DeniedPersons                    []string `dynamodbav:"deniedPersons"`
+	BisEntities                      []string `dynamodbav:"bisEntities"`
+	MilitaryEndUsers                 string   `dynamodbav:"militaryEndUsers"`
+	SectoralSanctions                []string `dynamodbav:"sectoralSanctions"`
+	UnverifiedCSL                    string   `dynamodbav:"unverifiedCSL"`
+	NonproliferationSanctions        string   `dynamodbav:"nonproliferationSanctions"`
+	ForeignSanctionsEvaders          string   `dynamodbav:"foreignSanctionsEvaders"`
+	PalestinianLegislativeCouncil    string   `dynamodbav:"palestinianLegislativeCouncil"`
+	CaptaList                        string   `dynamodbav:"captaList"`
+	ItarDebarred                     string   `dynamodbav:"itarDebarred"`
+	NonSDNChineseMilitaryIndustrial  string   `dynamodbav:"nonSDNChineseMilitaryIndustrialComplex"`
+	NonSDNMenuBasedSanctionsList     string   `dynamodbav:"nonSDNMenuBasedSanctionsList"`
+	EuConsolidatedSanctionsList      []string `dynamodbav:"euConsolidatedSanctionsList"`
+	UkConsolidatedSanctionsList      []string `dynamodbav:"ukConsolidatedSanctionsList"`
+	RefreshedAt                      string   `dynamodbav:"refreshedAt"`
+}
+
+
+
 // GetKey returns the composite primary key of the movie in a format that can be
 // sent to DynamoDB.
 func (movie Movie) GetKey() map[string]types.AttributeValue {

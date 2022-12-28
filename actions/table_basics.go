@@ -154,77 +154,8 @@ func (basics TableBasics) ListTables() ([]string, error) {
 
 // snippet-start:[gov2.dynamodb.PutItem]
 
-// item := map[string]*dynamodb.AttributeValue{
-// 	"SDNs": {
-// 		L: []*dynamodb.AttributeValue{},
-// 	},
-// 	"altNames": {
-// 		L: []*dynamodb.AttributeValue{},
-// 	},
-// 	"addresses": {
-// 		NULL: true,
-// 	},
-// 	"deniedPersons": {
-// 		L: []*dynamodb.AttributeValue{},
-// 	},
-// 	"bisEntities": {
-// 		L: []*dynamodb.AttributeValue{},
-// 	},
-// 	"militaryEndUsers": {
-// 		NULL: true,
-// 	},
-// 	"sectoralSanctions": {
-// 		L: []*dynamodb.AttributeValue{},
-// 	},
-// 	"unverifiedCSL": {
-// 		NULL: true,
-// 	},
-// 	"nonproliferationSanctions": {
-// 		NULL: true,
-// 	},
-// 	"foreignSanctionsEvaders": {
-// 		NULL: true,
-// 	},
-// 	"palestinianLegislativeCouncil": {
-// 		NULL: true,
-// 	},
-// 	"captaList": {
-// 		NULL: true,
-// 	},
-// 	"itarDebarred": {
-// 		NULL: true,
-// 	},
-// 	"nonSDNChineseMilitaryIndustrialComplex": {
-// 		NULL: true,
-// 	},
-// 	"nonSDNMenuBasedSanctionsList": {
-// 		NULL: true,
-// 	},
-// 	"euConsolidatedSanctionsList": {
-// 		L: []*dynamodb.AttributeValue{},
-// 	},
-// 	"ukConsolidatedSanctionsList": {
-// 		L: []*dynamodb.AttributeValue{},
-// 	},
-// 	"refreshedAt": {
-// 		S: "2022-12-27T21:34:37.812466469Z",
-// 	},
-// }
-
-// _, err := tableBasics.DynamoDbClient.PutItem(&dynamodb.PutItemInput{
-// 	TableName: aws.String(tableBasics.TableName),
-// 	Item:      item,
-// })
-// if err != nil {
-// 	logger.Logf("Error adding item to table: %v", err)
-// } else {
-// 	logger.Logf("Successfully added item to table %v", tableBasics.TableName)
-// }
-
-
-// AddMovie adds a movie the DynamoDB table.
-func (basics TableBasics) AddMovie(movie Movie) error {
-	item, err := attributevalue.MarshalMap(movie)
+func (basics TableBasics) AddQuery(queryResponse QueryResponse) error {
+	item, err := attributevalue.MarshalMap(queryResponse)
 	if err != nil {
 		panic(err)
 	}
@@ -234,8 +165,23 @@ func (basics TableBasics) AddMovie(movie Movie) error {
 	if err != nil {
 		log.Printf("Couldn't add item to table. Here's why: %v\n", err)
 	}
-	return err
+	return
 }
+
+// // AddMovie adds a movie the DynamoDB table.
+// func (basics TableBasics) AddMovie(movie Movie) error {
+// 	item, err := attributevalue.MarshalMap(movie)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	_, err = basics.DynamoDbClient.PutItem(context.TODO(), &dynamodb.PutItemInput{
+// 		TableName: aws.String(basics.TableName), Item: item,
+// 	})
+// 	if err != nil {
+// 		log.Printf("Couldn't add item to table. Here's why: %v\n", err)
+// 	}
+// 	return err
+// }
 
 // snippet-end:[gov2.dynamodb.PutItem]
 
@@ -275,172 +221,3 @@ func (basics TableBasics) UpdateMovie(movie Movie) (map[string]map[string]interf
 }
 
 // snippet-end:[gov2.dynamodb.UpdateItem]
-
-// snippet-start:[gov2.dynamodb.BatchWriteItem]
-
-// AddMovieBatch adds a slice of movies to the DynamoDB table. The function sends
-// batches of 25 movies to DynamoDB until all movies are added or it reaches the
-// specified maximum.
-func (basics TableBasics) AddMovieBatch(movies []Movie, maxMovies int) (int, error) {
-	var err error
-	var item map[string]types.AttributeValue
-	written := 0
-	batchSize := 25 // DynamoDB allows a maximum batch size of 25 items.
-	start := 0
-	end := start + batchSize
-	for start < maxMovies && start < len(movies) {
-		var writeReqs []types.WriteRequest
-		if end > len(movies) {
-			end = len(movies)
-		}
-		for _, movie := range movies[start:end] {
-			item, err = attributevalue.MarshalMap(movie)
-			if err != nil {
-				log.Printf("Couldn't marshal movie %v for batch writing. Here's why: %v\n", movie.Title, err)
-			} else {
-				writeReqs = append(
-					writeReqs,
-					types.WriteRequest{PutRequest: &types.PutRequest{Item: item}},
-				)
-			}
-		}
-		_, err = basics.DynamoDbClient.BatchWriteItem(context.TODO(), &dynamodb.BatchWriteItemInput{
-			RequestItems: map[string][]types.WriteRequest{basics.TableName: writeReqs}})
-		if err != nil {
-			log.Printf("Couldn't add a batch of movies to %v. Here's why: %v\n", basics.TableName, err)
-		} else {
-			written += len(writeReqs)
-		}
-		start = end
-		end += batchSize
-	}
-
-	return written, err
-}
-
-// snippet-end:[gov2.dynamodb.BatchWriteItem]
-
-// snippet-start:[gov2.dynamodb.GetItem]
-
-// GetMovie gets movie data from the DynamoDB table by using the primary composite key
-// made of title and year.
-func (basics TableBasics) GetMovie(title string, year int) (Movie, error) {
-	movie := Movie{Title: title, Year: year}
-	response, err := basics.DynamoDbClient.GetItem(context.TODO(), &dynamodb.GetItemInput{
-		Key: movie.GetKey(), TableName: aws.String(basics.TableName),
-	})
-	if err != nil {
-		log.Printf("Couldn't get info about %v. Here's why: %v\n", title, err)
-	} else {
-		err = attributevalue.UnmarshalMap(response.Item, &movie)
-		if err != nil {
-			log.Printf("Couldn't unmarshal response. Here's why: %v\n", err)
-		}
-	}
-	return movie, err
-}
-
-// snippet-end:[gov2.dynamodb.GetItem]
-
-// snippet-start:[gov2.dynamodb.Query]
-
-// Query gets all movies in the DynamoDB table that were released in the specified year.
-// The function uses the `expression` package to build the key condition expression
-// that is used in the query.
-func (basics TableBasics) Query(releaseYear int) ([]Movie, error) {
-	var err error
-	var response *dynamodb.QueryOutput
-	var movies []Movie
-	keyEx := expression.Key("year").Equal(expression.Value(releaseYear))
-	expr, err := expression.NewBuilder().WithKeyCondition(keyEx).Build()
-	if err != nil {
-		log.Printf("Couldn't build epxression for query. Here's why: %v\n", err)
-	} else {
-		response, err = basics.DynamoDbClient.Query(context.TODO(), &dynamodb.QueryInput{
-			TableName:                 aws.String(basics.TableName),
-			ExpressionAttributeNames:  expr.Names(),
-			ExpressionAttributeValues: expr.Values(),
-			KeyConditionExpression:    expr.KeyCondition(),
-		})
-		if err != nil {
-			log.Printf("Couldn't query for movies released in %v. Here's why: %v\n", releaseYear, err)
-		} else {
-			err = attributevalue.UnmarshalListOfMaps(response.Items, &movies)
-			if err != nil {
-				log.Printf("Couldn't unmarshal query response. Here's why: %v\n", err)
-			}
-		}
-	}
-	return movies, err
-}
-
-// snippet-end:[gov2.dynamodb.Query]
-
-// snippet-start:[gov2.dynamodb.Scan]
-
-// Scan gets all movies in the DynamoDB table that were released in a range of years
-// and projects them to return a reduced set of fields.
-// The function uses the `expression` package to build the filter and projection
-// expressions.
-func (basics TableBasics) Scan(startYear int, endYear int) ([]Movie, error) {
-	var movies []Movie
-	var err error
-	var response *dynamodb.ScanOutput
-	filtEx := expression.Name("year").Between(expression.Value(startYear), expression.Value(endYear))
-	projEx := expression.NamesList(
-		expression.Name("year"), expression.Name("title"), expression.Name("info.rating"))
-	expr, err := expression.NewBuilder().WithFilter(filtEx).WithProjection(projEx).Build()
-	if err != nil {
-		log.Printf("Couldn't build expressions for scan. Here's why: %v\n", err)
-	} else {
-		response, err = basics.DynamoDbClient.Scan(context.TODO(), &dynamodb.ScanInput{
-			TableName:                 aws.String(basics.TableName),
-			ExpressionAttributeNames:  expr.Names(),
-			ExpressionAttributeValues: expr.Values(),
-			FilterExpression:          expr.Filter(),
-			ProjectionExpression:      expr.Projection(),
-		})
-		if err != nil {
-			log.Printf("Couldn't scan for movies released between %v and %v. Here's why: %v\n",
-				startYear, endYear, err)
-		} else {
-			err = attributevalue.UnmarshalListOfMaps(response.Items, &movies)
-			if err != nil {
-				log.Printf("Couldn't unmarshal query response. Here's why: %v\n", err)
-			}
-		}
-	}
-	return movies, err
-}
-
-// snippet-end:[gov2.dynamodb.Scan]
-
-// snippet-start:[gov2.dynamodb.DeleteItem]
-
-// DeleteMovie removes a movie from the DynamoDB table.
-func (basics TableBasics) DeleteMovie(movie Movie) error {
-	_, err := basics.DynamoDbClient.DeleteItem(context.TODO(), &dynamodb.DeleteItemInput{
-		TableName: aws.String(basics.TableName), Key: movie.GetKey(),
-	})
-	if err != nil {
-		log.Printf("Couldn't delete %v from the table. Here's why: %v\n", movie.Title, err)
-	}
-	return err
-}
-
-// snippet-end:[gov2.dynamodb.DeleteItem]
-
-// snippet-start:[gov2.dynamodb.DeleteTable]
-
-// DeleteTable deletes the DynamoDB table and all of its data.
-func (basics TableBasics) DeleteTable() error {
-	_, err := basics.DynamoDbClient.DeleteTable(context.TODO(), &dynamodb.DeleteTableInput{
-		TableName: aws.String(basics.TableName)})
-	if err != nil {
-		log.Printf("Couldn't delete table %v. Here's why: %v\n", basics.TableName, err)
-	}
-	return err
-}
-
-// snippet-end:[gov2.dynamodb.DeleteTable]
-// snippet-end:[gov2.dynamodb.TableBasics.complete]
