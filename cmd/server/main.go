@@ -77,12 +77,12 @@ func main() {
 		panic(err)
 	}
 	if !exists {
-		logger.Logf("Creating table %v...\n", tableName)
+		logger.Logf("Creating table %v... \n", tableName)
 		_, err = tableBasics.CreateQueryTable()
 		if err != nil {
 			panic(err)
 		} else {
-			logger.Logf("Created table %v.\n", tableName)
+			logger.Logf("Created table %v. \n", tableName)
 		}
 	} else {
 		logger.Logf("Table %v already exists.\n", tableName)
