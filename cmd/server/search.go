@@ -82,7 +82,7 @@ func newSearcher(logger log.Logger, pipeline *pipeliner, workers int) *searcher 
 			"component": log.String("pipeline"),
 		}),
 		pipe: pipeline,
-		Gate: syncutil.NewGate(workers)
+		Gate: syncutil.NewGate(workers),
 	}
 }
 
