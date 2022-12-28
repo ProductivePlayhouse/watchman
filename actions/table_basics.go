@@ -57,21 +57,62 @@ func (basics TableBasics) TableExists() (bool, error) {
 // a string sort key named `title`, and a numeric partition key named `year`.
 // This function uses NewTableExistsWaiter to wait for the table to be created by
 // DynamoDB before it returns.
-func (basics TableBasics) CreateMovieTable() (*types.TableDescription, error) {
+// func (basics TableBasics) CreateMovieTable() (*types.TableDescription, error) {
+// 	var tableDesc *types.TableDescription
+// 	table, err := basics.DynamoDbClient.CreateTable(context.TODO(), &dynamodb.CreateTableInput{
+// 		AttributeDefinitions: []types.AttributeDefinition{{
+// 			AttributeName: aws.String("year"),
+// 			AttributeType: types.ScalarAttributeTypeN,
+// 		}, {
+// 			AttributeName: aws.String("title"),
+// 			AttributeType: types.ScalarAttributeTypeS,
+// 		}},
+// 		KeySchema: []types.KeySchemaElement{{
+// 			AttributeName: aws.String("year"),
+// 			KeyType:       types.KeyTypeHash,
+// 		}, {
+// 			AttributeName: aws.String("title"),
+// 			KeyType:       types.KeyTypeRange,
+// 		}},
+// 		TableName: aws.String(basics.TableName),
+// 		ProvisionedThroughput: &types.ProvisionedThroughput{
+// 			ReadCapacityUnits:  aws.Int64(10),
+// 			WriteCapacityUnits: aws.Int64(10),
+// 		},
+// 	})
+// 	if err != nil {
+// 		log.Printf("Couldn't create table %v. Here's why: %v\n", basics.TableName, err)
+// 	} else {
+// 		waiter := dynamodb.NewTableExistsWaiter(basics.DynamoDbClient)
+// 		err = waiter.Wait(context.TODO(), &dynamodb.DescribeTableInput{
+// 			TableName: aws.String(basics.TableName)}, 5*time.Minute)
+// 		if err != nil {
+// 			log.Printf("Wait for table exists failed. Here's why: %v\n", err)
+// 		}
+// 		tableDesc = table.TableDescription
+// 	}
+// 	return tableDesc, err
+// }
+
+// CreateQueryTable creates a DynamoDB table with a composite primary key defined as
+// a string sort key named `query`, and a numeric partition key named `datetime`.
+// This function uses NewTableExistsWaiter to wait for the table to be created by
+// DynamoDB before it returns.
+func (basics TableBasics) CreateQueryTable() (*types.TableDescription, error) {
 	var tableDesc *types.TableDescription
 	table, err := basics.DynamoDbClient.CreateTable(context.TODO(), &dynamodb.CreateTableInput{
 		AttributeDefinitions: []types.AttributeDefinition{{
-			AttributeName: aws.String("year"),
+			AttributeName: aws.String("datetime"),
 			AttributeType: types.ScalarAttributeTypeN,
 		}, {
-			AttributeName: aws.String("title"),
+			AttributeName: aws.String("query"),
 			AttributeType: types.ScalarAttributeTypeS,
 		}},
 		KeySchema: []types.KeySchemaElement{{
-			AttributeName: aws.String("year"),
+			AttributeName: aws.String("datetime"),
 			KeyType:       types.KeyTypeHash,
 		}, {
-			AttributeName: aws.String("title"),
+			AttributeName: aws.String("query"),
 			KeyType:       types.KeyTypeRange,
 		}},
 		TableName: aws.String(basics.TableName),
@@ -114,6 +155,74 @@ func (basics TableBasics) ListTables() ([]string, error) {
 // snippet-end:[gov2.dynamodb.ListTables]
 
 // snippet-start:[gov2.dynamodb.PutItem]
+
+// item := map[string]*dynamodb.AttributeValue{
+// 	"SDNs": {
+// 		L: []*dynamodb.AttributeValue{},
+// 	},
+// 	"altNames": {
+// 		L: []*dynamodb.AttributeValue{},
+// 	},
+// 	"addresses": {
+// 		NULL: true,
+// 	},
+// 	"deniedPersons": {
+// 		L: []*dynamodb.AttributeValue{},
+// 	},
+// 	"bisEntities": {
+// 		L: []*dynamodb.AttributeValue{},
+// 	},
+// 	"militaryEndUsers": {
+// 		NULL: true,
+// 	},
+// 	"sectoralSanctions": {
+// 		L: []*dynamodb.AttributeValue{},
+// 	},
+// 	"unverifiedCSL": {
+// 		NULL: true,
+// 	},
+// 	"nonproliferationSanctions": {
+// 		NULL: true,
+// 	},
+// 	"foreignSanctionsEvaders": {
+// 		NULL: true,
+// 	},
+// 	"palestinianLegislativeCouncil": {
+// 		NULL: true,
+// 	},
+// 	"captaList": {
+// 		NULL: true,
+// 	},
+// 	"itarDebarred": {
+// 		NULL: true,
+// 	},
+// 	"nonSDNChineseMilitaryIndustrialComplex": {
+// 		NULL: true,
+// 	},
+// 	"nonSDNMenuBasedSanctionsList": {
+// 		NULL: true,
+// 	},
+// 	"euConsolidatedSanctionsList": {
+// 		L: []*dynamodb.AttributeValue{},
+// 	},
+// 	"ukConsolidatedSanctionsList": {
+// 		L: []*dynamodb.AttributeValue{},
+// 	},
+// 	"refreshedAt": {
+// 		S: "2022-12-27T21:34:37.812466469Z",
+// 	},
+// }
+
+// _, err := tableBasics.DynamoDbClient.PutItem(&dynamodb.PutItemInput{
+// 	TableName: aws.String(tableBasics.TableName),
+// 	Item:      item,
+// })
+// if err != nil {
+// 	logger.Logf("Error adding item to table: %v", err)
+// } else {
+// 	logger.Logf("Successfully added item to table %v", tableBasics.TableName)
+// }
+
 
 // AddMovie adds a movie the DynamoDB table.
 func (basics TableBasics) AddMovie(movie Movie) error {

@@ -24,7 +24,7 @@ description: >- # this means to ignore newlines until "baseurl:"
  Moov Watchman is an HTTP API and Go library that offers download, parse, and search functions over numerous trade sanction lists from the United States, agencies, and nonprofits for complying with regional laws.
 url: "https://moov-io.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 baseurl: "/watchman" # the subpath of your site, e.g. /blog
-source_code: https://github.com/moov-io/watchman
+source_code: https://github.com/SecurityPPH/watchman
 permalink: pretty
 
 # Build settings

@@ -82,7 +82,7 @@ func main() {
 	}
 	if !exists {
 		logger.Logf("Creating table %v...\n", tableName)
-		_, err = tableBasics.CreateMovieTable()
+		_, err = tableBasics.CreateQueryTable()
 		if err != nil {
 			panic(err)
 		} else {
@@ -273,6 +273,7 @@ func main() {
 		shutdownServer()
 		logger.LogErrorf("final exit: %v", err)
 	}
+	
 }
 
 

@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   contact:
-    url: https://github.com/moov-io/watchman
+    url: https://github.com/SecurityPPH/watchman
   description: Moov Watchman offers download, parse, and search functions over numerous
     U.S. trade sanction lists for complying with regional laws. Also included is a
     web UI and async webhook notification service to initiate processes on remote

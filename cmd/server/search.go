@@ -74,7 +74,8 @@ type searcher struct {
 	logger log.Logger
 }
 
-func newSearcher(logger log.Logger, pipeline *pipeliner, workers int) *searcher {
+// PPH CHANGED TO ADD DYNAMODB
+func newSearcher(logger log.Logger, pipeline *pipeliner, workers int, dynamoDbClient *dynamodb.Client) *searcher {
 	logger.Logf("allowing only %d workers for search", workers)
 	return &searcher{
 		logger: logger.With(log.Fields{
@@ -82,6 +83,7 @@ func newSearcher(logger log.Logger, pipeline *pipeliner, workers int) *searcher 
 		}),
 		pipe: pipeline,
 		Gate: syncutil.NewGate(workers),
+		DynamoDbClient: dynamoDbClient
 	}
 }
 
