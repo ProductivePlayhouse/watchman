@@ -95,9 +95,10 @@ func (basics TableBasics) TableExists() (bool, error) {
 // }
 
 // CreateQueryTable creates a DynamoDB table with a composite primary key defined as
-// a string sort key named `datetime`, and a numeric partition key named `query`.
+// a string partition key named `query` and a numeric sort key named `datetime`.
 // This function uses NewTableExistsWaiter to wait for the table to be created by
 // DynamoDB before it returns.
+// This table uses on-demand pay-per-request billing.
 func (basics TableBasics) CreateQueryTable() (*types.TableDescription, error) {
 	var tableDesc *types.TableDescription
 	table, err := basics.DynamoDbClient.CreateTable(context.TODO(), &dynamodb.CreateTableInput{
@@ -107,6 +108,13 @@ func (basics TableBasics) CreateQueryTable() (*types.TableDescription, error) {
 		}, {
 			AttributeName: aws.String("datetime"),
 			AttributeType: types.ScalarAttributeTypeN,
+		}},
+		KeySchema: []types.KeySchemaElement{{
+			AttributeName: aws.String("query"),
+			KeyType:       types.KeyTypeHash,
+		}, {
+			AttributeName: aws.String("datetime"),
+			KeyType:       types.KeyTypeRange,
 		}},
 		TableName: aws.String(basics.TableName),
 		BillingMode: types.BillingModePayPerRequest,
