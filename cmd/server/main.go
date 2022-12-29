@@ -115,8 +115,8 @@ func main() {
 	// }
 
 	exampleResponse := actions.QueryResponse{
-		query: "testQuery",
-        datetime: time.Now().Unix(),        
+		Query: "testQuery",
+        Datetime: time.Now().Unix(),        
 		SDNs: []string{"testSDN1", "testSDN2"},
 		AltNames: []string{"testAltName1", "testAltName2"},
 		Addresses: "testAddress",
