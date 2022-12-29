@@ -81,8 +81,8 @@ type Movie struct {
 // 		S: "2022-12-27T21:34:37.812466469Z",
 // 	},
 type QueryResponse struct {
-	Query						     string   `dynamodbav:"query"`
-	Datetime 					     int64    `dynamodbav:"datetime"`
+	query						     string   `dynamodbav:"query"`
+	datetime 					     int64    `dynamodbav:"datetime"`
 	SDNs                             []string `dynamodbav:"SDNs"`
 	AltNames                         []string `dynamodbav:"altNames"`
 	Addresses                        string   `dynamodbav:"addresses"`
