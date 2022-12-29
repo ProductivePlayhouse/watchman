@@ -82,6 +82,7 @@ type Movie struct {
 // 	},
 type QueryResponse struct {
 	Query						     string   `dynamodbav:"query"`
+	Datetime 					   	 string   `dynamodbav:"datetime"`	
 	SDNs                             []string `dynamodbav:"SDNs"`
 	AltNames                         []string `dynamodbav:"altNames"`
 	Addresses                        string   `dynamodbav:"addresses"`
@@ -99,7 +100,6 @@ type QueryResponse struct {
 	NonSDNMenuBasedSanctionsList     string   `dynamodbav:"nonSDNMenuBasedSanctionsList"`
 	EuConsolidatedSanctionsList      []string `dynamodbav:"euConsolidatedSanctionsList"`
 	UkConsolidatedSanctionsList      []string `dynamodbav:"ukConsolidatedSanctionsList"`
-	RefreshedAt                      string   `dynamodbav:"refreshedAt"`
 }
 
 

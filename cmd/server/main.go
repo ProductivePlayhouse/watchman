@@ -133,7 +133,7 @@ func main() {
 		NonSDNMenuBasedSanctionsList: "testNonSDNMenuBasedSanctionsList",
 		EuConsolidatedSanctionsList: []string{"testEuConsolidatedSanctionsList1", "testEuConsolidatedSanctionsList2"},
 		UkConsolidatedSanctionsList: []string{"testUkConsolidatedSanctionsList1", "testUkConsolidatedSanctionsList2"},
-		RefreshedAt: "12/28/2022 15:04:05",
+        Datetime: time.Now(),
 	}
 
     // Log that we are adding exampleResponse to the table
