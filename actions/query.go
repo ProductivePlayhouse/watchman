@@ -82,7 +82,7 @@ type Movie struct {
 // 	},
 type QueryResponse struct {
 	Query						     string   `dynamodbav:"query"`
-	Datetime 					     int      `dynamodbav:"datetime"`
+	Datetime 					     int64    `dynamodbav:"datetime"`
 	SDNs                             []string `dynamodbav:"SDNs"`
 	AltNames                         []string `dynamodbav:"altNames"`
 	Addresses                        string   `dynamodbav:"addresses"`
