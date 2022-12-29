@@ -116,6 +116,7 @@ func main() {
 
 	exampleResponse := actions.QueryResponse{
 		Query: "testQuery",
+        Datetime: time.Now().Unix(),        
 		SDNs: []string{"testSDN1", "testSDN2"},
 		AltNames: []string{"testAltName1", "testAltName2"},
 		Addresses: "testAddress",
@@ -133,7 +134,6 @@ func main() {
 		NonSDNMenuBasedSanctionsList: "testNonSDNMenuBasedSanctionsList",
 		EuConsolidatedSanctionsList: []string{"testEuConsolidatedSanctionsList1", "testEuConsolidatedSanctionsList2"},
 		UkConsolidatedSanctionsList: []string{"testUkConsolidatedSanctionsList1", "testUkConsolidatedSanctionsList2"},
-        Datetime: time.Now(),
 	}
 
     // Log that we are adding exampleResponse to the table
