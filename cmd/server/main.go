@@ -113,6 +113,7 @@ func main() {
 	// 	UkConsolidatedSanctionsList      []string `dynamodbav:"ukConsolidatedSanctionsList"`
 	// 	RefreshedAt                      string   `dynamodbav:"refreshedAt"`
 	// }
+
 	exampleResponse := actions.QueryResponse{
 		Query: "testQuery",
 		SDNs: []string{"testSDN1", "testSDN2"},
@@ -133,9 +134,18 @@ func main() {
 		EuConsolidatedSanctionsList: []string{"testEuConsolidatedSanctionsList1", "testEuConsolidatedSanctionsList2"},
 		UkConsolidatedSanctionsList: []string{"testUkConsolidatedSanctionsList1", "testUkConsolidatedSanctionsList2"},
 		RefreshedAt: "12/28/2022 15:04:05",
-	}	
+	}
+
+    // Log that we are adding exampleResponse to the table
+    logger.Logf("Adding exampleResponse to table %v... \n", tableName)
 
 	// Use tableBasics.AddQuery to add exampleResponse to the table
+    err = tableBasics.AddQuery(exampleResponse)
+
+    if err != nil {
+        panic(err)
+    }
+
     tableBasics.AddQuery(exampleResponse)
 
 	// END DYNAMODB SECTION	
