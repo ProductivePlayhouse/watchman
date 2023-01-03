@@ -25,13 +25,13 @@ import (
 	"github.com/moov-io/base/http/bind"
 	"github.com/moov-io/base/log"
 	"github.com/moov-io/watchman"
-	"github.com/moov-io/watchman/actions"
+	// "github.com/moov-io/watchman/actions"
 	"github.com/moov-io/watchman/internal/database"
 
 	"github.com/gorilla/mux"
 
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	// "github.com/aws/aws-sdk-go-v2/config"
+	// "github.com/aws/aws-sdk-go-v2/service/dynamodb"
 )
 
 var (
@@ -66,87 +66,85 @@ func main() {
 
 	// BEGIN DYNAMODB SECTION
 
-	sdkConfig, err := config.LoadDefaultConfig(context.TODO())
-	if err != nil {
-		logger.Logf("unable to load SDK config, %v", err)
-	}
-	tableName := "watchman-queries"
+	// sdkConfig, err := config.LoadDefaultConfig(context.TODO())
+	// if err != nil {
+	// 	logger.Logf("unable to load SDK config, %v", err)
+	// }
+	// tableName := "watchman-queries"
 	
-	tableBasics := actions.TableBasics{TableName: tableName,
-		DynamoDbClient: dynamodb.NewFromConfig(sdkConfig)}
+	// tableBasics := actions.TableBasics{TableName: tableName,
+	// 	DynamoDbClient: dynamodb.NewFromConfig(sdkConfig)}
 
-	exists, err := tableBasics.TableExists()
-	if err != nil {
-		panic(err)
-	}
-	if !exists {
-		logger.Logf("Creating table %v... \n", tableName)
-		_, err = tableBasics.CreateQueryTable()
-		if err != nil {
-			panic(err)
-		} else {
-			logger.Logf("Created table %v. \n", tableName)
-		}
-	} else {
-		logger.Logf("Table %v already exists.\n", tableName)
-	}
-
-	// Create an instance of the type:
-	// type QueryResponse struct {
-	// 	Query						     string   `dynamodbav:"query"`
-	// 	SDNs                             []string `dynamodbav:"SDNs"`
-	// 	AltNames                         []string `dynamodbav:"altNames"`
-	// 	Addresses                        string   `dynamodbav:"addresses"`
-	// 	DeniedPersons                    []string `dynamodbav:"deniedPersons"`
-	// 	BisEntities                      []string `dynamodbav:"bisEntities"`
-	// 	MilitaryEndUsers                 string   `dynamodbav:"militaryEndUsers"`
-	// 	SectoralSanctions                []string `dynamodbav:"sectoralSanctions"`
-	// 	UnverifiedCSL                    string   `dynamodbav:"unverifiedCSL"`
-	// 	NonproliferationSanctions        string   `dynamodbav:"nonproliferationSanctions"`
-	// 	ForeignSanctionsEvaders          string   `dynamodbav:"foreignSanctionsEvaders"`
-	// 	PalestinianLegislativeCouncil    string   `dynamodbav:"palestinianLegislativeCouncil"`
-	// 	CaptaList                        string   `dynamodbav:"captaList"`
-	// 	ItarDebarred                     string   `dynamodbav:"itarDebarred"`
-	// 	NonSDNChineseMilitaryIndustrial  string   `dynamodbav:"nonSDNChineseMilitaryIndustrialComplex"`
-	// 	NonSDNMenuBasedSanctionsList     string   `dynamodbav:"nonSDNMenuBasedSanctionsList"`
-	// 	EuConsolidatedSanctionsList      []string `dynamodbav:"euConsolidatedSanctionsList"`
-	// 	UkConsolidatedSanctionsList      []string `dynamodbav:"ukConsolidatedSanctionsList"`
-	// 	RefreshedAt                      string   `dynamodbav:"refreshedAt"`
+	// exists, err := tableBasics.TableExists()
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// if !exists {
+	// 	logger.Logf("Creating table %v... \n", tableName)
+	// 	_, err = tableBasics.CreateQueryTable()
+	// 	if err != nil {
+	// 		panic(err)
+	// 	} else {
+	// 		logger.Logf("Created table %v. \n", tableName)
+	// 	}
+	// } else {
+	// 	logger.Logf("Table %v already exists.\n", tableName)
 	// }
 
-	exampleResponse := actions.QueryResponse{
-		Query: "testQuery",
-        Datetime: time.Now().Unix(),        
-		SDNs: []string{"testSDN1", "testSDN2"},
-		AltNames: []string{"testAltName1", "testAltName2"},
-		Addresses: "testAddress",
-		DeniedPersons: []string{"testDeniedPerson1", "testDeniedPerson2"},
-		BisEntities: []string{"testBisEntity1", "testBisEntity2"},
-		MilitaryEndUsers: "testMilitaryEndUser",
-		SectoralSanctions: []string{"testSectoralSanction1", "testSectoralSanction2"},
-		UnverifiedCSL: "testUnverifiedCSL",
-		NonproliferationSanctions: "testNonproliferationSanctions",
-		ForeignSanctionsEvaders: "testForeignSanctionsEvaders",
-		PalestinianLegislativeCouncil: "testPalestinianLegislativeCouncil",
-		CaptaList: "testCaptaList",
-		ItarDebarred: "testItarDebarred",
-		NonSDNChineseMilitaryIndustrial: "testNonSDNChineseMilitaryIndustrial",
-		NonSDNMenuBasedSanctionsList: "testNonSDNMenuBasedSanctionsList",
-		EuConsolidatedSanctionsList: []string{"testEuConsolidatedSanctionsList1", "testEuConsolidatedSanctionsList2"},
-		UkConsolidatedSanctionsList: []string{"testUkConsolidatedSanctionsList1", "testUkConsolidatedSanctionsList2"},
-	}
+	// // Create an instance of the type:
+	// // type QueryResponse struct {
+	// // 	Query						     string   `dynamodbav:"query"`
+	// // 	SDNs                             []string `dynamodbav:"SDNs"`
+	// // 	AltNames                         []string `dynamodbav:"altNames"`
+	// // 	Addresses                        string   `dynamodbav:"addresses"`
+	// // 	DeniedPersons                    []string `dynamodbav:"deniedPersons"`
+	// // 	BisEntities                      []string `dynamodbav:"bisEntities"`
+	// // 	MilitaryEndUsers                 string   `dynamodbav:"militaryEndUsers"`
+	// // 	SectoralSanctions                []string `dynamodbav:"sectoralSanctions"`
+	// // 	UnverifiedCSL                    string   `dynamodbav:"unverifiedCSL"`
+	// // 	NonproliferationSanctions        string   `dynamodbav:"nonproliferationSanctions"`
+	// // 	ForeignSanctionsEvaders          string   `dynamodbav:"foreignSanctionsEvaders"`
+	// // 	PalestinianLegislativeCouncil    string   `dynamodbav:"palestinianLegislativeCouncil"`
+	// // 	CaptaList                        string   `dynamodbav:"captaList"`
+	// // 	ItarDebarred                     string   `dynamodbav:"itarDebarred"`
+	// // 	NonSDNChineseMilitaryIndustrial  string   `dynamodbav:"nonSDNChineseMilitaryIndustrialComplex"`
+	// // 	NonSDNMenuBasedSanctionsList     string   `dynamodbav:"nonSDNMenuBasedSanctionsList"`
+	// // 	EuConsolidatedSanctionsList      []string `dynamodbav:"euConsolidatedSanctionsList"`
+	// // 	UkConsolidatedSanctionsList      []string `dynamodbav:"ukConsolidatedSanctionsList"`
+	// // 	RefreshedAt                      string   `dynamodbav:"refreshedAt"`
+	// // }
 
-    // Log that we are adding exampleResponse to the table
-    logger.Logf("Adding exampleResponse to table %v... \n", tableName)
+	// exampleResponse := actions.QueryResponse{
+	// 	Query: "testQuery",
+    //     Datetime: time.Now().Unix(),        
+	// 	SDNs: []string{"testSDN1", "testSDN2"},
+	// 	AltNames: []string{"testAltName1", "testAltName2"},
+	// 	Addresses: "testAddress",
+	// 	DeniedPersons: []string{"testDeniedPerson1", "testDeniedPerson2"},
+	// 	BisEntities: []string{"testBisEntity1", "testBisEntity2"},
+	// 	MilitaryEndUsers: "testMilitaryEndUser",
+	// 	SectoralSanctions: []string{"testSectoralSanction1", "testSectoralSanction2"},
+	// 	UnverifiedCSL: "testUnverifiedCSL",
+	// 	NonproliferationSanctions: "testNonproliferationSanctions",
+	// 	ForeignSanctionsEvaders: "testForeignSanctionsEvaders",
+	// 	PalestinianLegislativeCouncil: "testPalestinianLegislativeCouncil",
+	// 	CaptaList: "testCaptaList",
+	// 	ItarDebarred: "testItarDebarred",
+	// 	NonSDNChineseMilitaryIndustrial: "testNonSDNChineseMilitaryIndustrial",
+	// 	NonSDNMenuBasedSanctionsList: "testNonSDNMenuBasedSanctionsList",
+	// 	EuConsolidatedSanctionsList: []string{"testEuConsolidatedSanctionsList1", "testEuConsolidatedSanctionsList2"},
+	// 	UkConsolidatedSanctionsList: []string{"testUkConsolidatedSanctionsList1", "testUkConsolidatedSanctionsList2"},
+	// }
 
-	// Use tableBasics.AddQuery to add exampleResponse to the table
-    err = tableBasics.AddQuery(exampleResponse)
+    // // Log that we are adding exampleResponse to the table
+    // logger.Logf("Adding exampleResponse to table %v... \n", tableName)
 
-    if err != nil {
-        panic(err)
-    }
+	// // Use tableBasics.AddQuery to add exampleResponse to the table
+    // err = tableBasics.AddQuery(exampleResponse)
 
-    tableBasics.AddQuery(exampleResponse)
+    // if err != nil {
+    //     panic(err)
+    // }
 
 	// END DYNAMODB SECTION	
 

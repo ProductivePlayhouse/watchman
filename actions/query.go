@@ -25,61 +25,8 @@ type Movie struct {
 	Info  map[string]interface{} `dynamodbav:"info"`
 }
 
-// Create a type struct with the following data types
-// 	"SDNs": {
-// 		L: []*dynamodb.AttributeValue{},
-// 	},
-// 	"altNames": {
-// 		L: []*dynamodb.AttributeValue{},
-// 	},
-// 	"addresses": {
-// 		NULL: true,
-// 	},
-// 	"deniedPersons": {
-// 		L: []*dynamodb.AttributeValue{},
-// 	},
-// 	"bisEntities": {
-// 		L: []*dynamodb.AttributeValue{},
-// 	},
-// 	"militaryEndUsers": {
-// 		NULL: true,
-// 	},
-// 	"sectoralSanctions": {
-// 		L: []*dynamodb.AttributeValue{},
-// 	},
-// 	"unverifiedCSL": {
-// 		NULL: true,
-// 	},
-// 	"nonproliferationSanctions": {
-// 		NULL: true,
-// 	},
-// 	"foreignSanctionsEvaders": {
-// 		NULL: true,
-// 	},
-// 	"palestinianLegislativeCouncil": {
-// 		NULL: true,
-// 	},
-// 	"captaList": {
-// 		NULL: true,
-// 	},
-// 	"itarDebarred": {
-// 		NULL: true,
-// 	},
-// 	"nonSDNChineseMilitaryIndustrialComplex": {
-// 		NULL: true,
-// 	},
-// 	"nonSDNMenuBasedSanctionsList": {
-// 		NULL: true,
-// 	},
-// 	"euConsolidatedSanctionsList": {
-// 		L: []*dynamodb.AttributeValue{},
-// 	},
-// 	"ukConsolidatedSanctionsList": {
-// 		L: []*dynamodb.AttributeValue{},
-// 	},
-// 	"refreshedAt": {
-// 		S: "2022-12-27T21:34:37.812466469Z",
-// 	},
+
+// TODO: Add highest match to the struct!
 type QueryResponse struct {
 	Query						     string   `dynamodbav:"query"`
 	Datetime 					     int64    `dynamodbav:"datetime"`

@@ -21,6 +21,11 @@ import (
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/gorilla/mux"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
+
+	// "github.com/moov-io/watchman"
+	// "github.com/moov-io/watchman/internal/database"	
+	// "github.com/aws/aws-sdk-go-v2/config"	
+	// "github.com/aws/aws-sdk-go-v2/service/dynamodb"	
 )
 
 var (
@@ -150,35 +155,39 @@ func search(logger log.Logger, searcher *searcher) http.HandlerFunc {
 }
 
 type searchResponse struct {
+	// DynamoDB - PPH Added
+	Query   string     `json:"query" dynamodbav:"query"`
+	Datetime int64     `json:"datetime" dynamodbav:"datetime"` // unix timestamp	
+
 	// OFAC
-	SDNs      []*SDN    `json:"SDNs"`
-	AltNames  []Alt     `json:"altNames"`
-	Addresses []Address `json:"addresses"`
+	SDNs      []*SDN    `json:"SDNs" dynamodbav:"SDNs"`
+	AltNames  []Alt     `json:"altNames" dynamodbav:"altNames"`
+	Addresses []Address `json:"addresses" dynamodbav:"addresses"`
 
 	// BIS
-	DeniedPersons []DP `json:"deniedPersons"`
+	DeniedPersons []DP `json:"deniedPersons" dynamodbav:"deniedPersons"`
 
 	// Consolidated Screening List
-	BISEntities                            []*Result[csl.EL]     `json:"bisEntities"`
-	MilitaryEndUsers                       []*Result[csl.MEU]    `json:"militaryEndUsers"`
-	SectoralSanctions                      []*Result[csl.SSI]    `json:"sectoralSanctions"`
-	Unverified                             []*Result[csl.UVL]    `json:"unverifiedCSL"`
-	NonproliferationSanctions              []*Result[csl.ISN]    `json:"nonproliferationSanctions"`
-	ForeignSanctionsEvaders                []*Result[csl.FSE]    `json:"foreignSanctionsEvaders"`
-	PalestinianLegislativeCouncil          []*Result[csl.PLC]    `json:"palestinianLegislativeCouncil"`
-	CaptaList                              []*Result[csl.CAP]    `json:"captaList"`
-	ITARDebarred                           []*Result[csl.DTC]    `json:"itarDebarred"`
-	NonSDNChineseMilitaryIndustrialComplex []*Result[csl.CMIC]   `json:"nonSDNChineseMilitaryIndustrialComplex"`
-	NonSDNMenuBasedSanctionsList           []*Result[csl.NS_MBS] `json:"nonSDNMenuBasedSanctionsList"`
+	BISEntities                            []*Result[csl.EL]     `json:"bisEntities" dynamodbav:"bisEntities"`
+	MilitaryEndUsers                       []*Result[csl.MEU]    `json:"militaryEndUsers" dynamodbav:"militaryEndUsers"`
+	SectoralSanctions                      []*Result[csl.SSI]    `json:"sectoralSanctions" dynamodbav:"sectoralSanctions"`
+	Unverified                             []*Result[csl.UVL]    `json:"unverifiedCSL" dynamodbav:"unverifiedCSL"`
+	NonproliferationSanctions              []*Result[csl.ISN]    `json:"nonproliferationSanctions" dynamodbav:"nonproliferationSanctions"`
+	ForeignSanctionsEvaders                []*Result[csl.FSE]    `json:"foreignSanctionsEvaders" dynamodbav:"foreignSanctionsEvaders"`
+	PalestinianLegislativeCouncil          []*Result[csl.PLC]    `json:"palestinianLegislativeCouncil" dynamodbav:"palestinianLegislativeCouncil"`
+	CaptaList                              []*Result[csl.CAP]    `json:"captaList" dynamodbav:"captaList"`
+	ITARDebarred                           []*Result[csl.DTC]    `json:"itarDebarred" dynamodbav:"itarDebarred"`
+	NonSDNChineseMilitaryIndustrialComplex []*Result[csl.CMIC]   `json:"nonSDNChineseMilitaryIndustrialComplex" dynamodbav:"nonSDNChineseMilitaryIndustrialComplex"`
+	NonSDNMenuBasedSanctionsList           []*Result[csl.NS_MBS] `json:"nonSDNMenuBasedSanctionsList" dynamodbav:"nonSDNMenuBasedSanctionsList"`
 
 	// EU - Consolidated Sanctions List
-	EUCSL []*Result[csl.EUCSLRecord] `json:"euConsolidatedSanctionsList"`
+	EUCSL []*Result[csl.EUCSLRecord] `json:"euConsolidatedSanctionsList" dynamodbav:"euConsolidatedSanctionsList"`
 
 	// UK - Consolidated Sanctions List
-	UKCSL []*Result[csl.UKCSLRecord] `json:"ukConsolidatedSanctionsList"`
+	UKCSL []*Result[csl.UKCSLRecord] `json:"ukConsolidatedSanctionsList" dynamodbav:"ukConsolidatedSanctionsList"`
 
 	// Metadata
-	RefreshedAt time.Time `json:"refreshedAt"`
+	RefreshedAt time.Time `json:"refreshedAt" dynamodbav:"refreshedAt"`
 }
 
 func buildAddressCompares(req addressSearchRequest) []func(*Address) *item {
@@ -450,9 +459,11 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 			matchHist.With("type", "name").Observe(0.0)
 		}
 
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(&searchResponse{
+		// PPH CHANGED
+		resp := &searchResponse{
+			// DynamoDB
+			Query: nameSlug,
+			Datetime: searcher.lastRefreshedAt.Unix(),
 			// OFAC
 			SDNs:              sdns,
 			AltNames:          searcher.TopAltNames(limit, minMatch, nameSlug),
@@ -465,8 +476,14 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 			// UKCSL
 			UKCSL: searcher.TopUKCSL(limit, minMatch, nameSlug),
 			// Metadata
-			RefreshedAt: searcher.lastRefreshedAt,
-		})
+			RefreshedAt: searcher.lastRefreshedAt,			
+		}
+		WriteQueryToDB(logger, *resp)
+
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+
+		json.NewEncoder(w).Encode(&resp)
 	}
 }
 
