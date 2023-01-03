@@ -156,8 +156,9 @@ func search(logger log.Logger, searcher *searcher) http.HandlerFunc {
 
 type searchResponse struct {
 	// DynamoDB - PPH Added
-	Query   string     `json:"query" dynamodbav:"query"`
-	Datetime int64     `json:"datetime" dynamodbav:"datetime"` // unix timestamp	
+	Query   string       `json:"query" dynamodbav:"query"`
+	Datetime int64       `json:"datetime" dynamodbav:"datetime"` // unix timestamp
+	HighestMatch float64 `json:"highestMatch" dynamodbav:"highestMatch"`
 
 	// OFAC
 	SDNs      []*SDN    `json:"SDNs" dynamodbav:"SDNs"`
@@ -374,6 +375,9 @@ func buildFullSearchResponseWith(searcher *searcher, searchGatherings []searchGa
 		}(i)
 	}
 	wg.Wait()
+
+
+
 	return &resp
 }
 
@@ -459,22 +463,54 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 			matchHist.With("type", "name").Observe(0.0)
 		}
 
+		altNames := searcher.TopAltNames(limit, minMatch, nameSlug)
+		sectoralSanctions := searcher.TopSSIs(limit, minMatch, nameSlug)
+		deniedPersons := searcher.TopDPs(limit, minMatch, nameSlug)
+		bisEntities := searcher.TopBISEntities(limit, minMatch, nameSlug)
+		eucsl := searcher.TopEUCSL(limit, minMatch, nameSlug)
+		ukcsl := searcher.TopUKCSL(limit, minMatch, nameSlug)
+
+		highestMatch := 0.0
+
+		if len(sdns) > 0 && sdns[0].match > highestMatch {
+			highestMatch = sdns[0].match
+		}
+		if len(altNames) > 0 && altNames[0].match > highestMatch {
+			highestMatch = altNames[0].match
+		}
+		if len(sectoralSanctions) > 0 && sectoralSanctions[0].match > highestMatch {
+			highestMatch = sectoralSanctions[0].match
+		}
+		if len(deniedPersons) > 0 && deniedPersons[0].match > highestMatch {
+			highestMatch = deniedPersons[0].match
+		}
+		if len(bisEntities) > 0 && bisEntities[0].match > highestMatch {
+			highestMatch = bisEntities[0].match
+		}
+		if len(eucsl) > 0 && eucsl[0].match > highestMatch {
+			highestMatch = eucsl[0].match
+		}
+		if len(ukcsl) > 0 && ukcsl[0].match > highestMatch {
+			highestMatch = ukcsl[0].match
+		}
+	
 		// PPH CHANGED
 		resp := &searchResponse{
 			// DynamoDB
 			Query: nameSlug,
 			Datetime: searcher.lastRefreshedAt.Unix(),
+			HighestMatch: highestMatch,
 			// OFAC
 			SDNs:              sdns,
-			AltNames:          searcher.TopAltNames(limit, minMatch, nameSlug),
-			SectoralSanctions: searcher.TopSSIs(limit, minMatch, nameSlug),
+			AltNames:          altNames,
+			SectoralSanctions: sectoralSanctions,
 			// BIS
-			DeniedPersons: searcher.TopDPs(limit, minMatch, nameSlug),
-			BISEntities:   searcher.TopBISEntities(limit, minMatch, nameSlug),
+			DeniedPersons: deniedPersons,
+			BISEntities:   bisEntities,
 			// EUCSL
-			EUCSL: searcher.TopEUCSL(limit, minMatch, nameSlug),
+			EUCSL: eucsl,
 			// UKCSL
-			UKCSL: searcher.TopUKCSL(limit, minMatch, nameSlug),
+			UKCSL: ukcsl,
 			// Metadata
 			RefreshedAt: searcher.lastRefreshedAt,			
 		}

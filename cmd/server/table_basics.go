@@ -14,12 +14,10 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"	
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
-	// "github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 )
 
-// snippet-start:[gov2.dynamodb.TableBasics.complete]
 // snippet-start:[gov2.dynamodb.TableBasics.struct]
 
 // TableBasics encapsulates the Amazon DynamoDB service actions used in the examples.

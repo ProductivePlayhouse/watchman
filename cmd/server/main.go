@@ -25,13 +25,9 @@ import (
 	"github.com/moov-io/base/http/bind"
 	"github.com/moov-io/base/log"
 	"github.com/moov-io/watchman"
-	// "github.com/moov-io/watchman/actions"
 	"github.com/moov-io/watchman/internal/database"
 
 	"github.com/gorilla/mux"
-
-	// "github.com/aws/aws-sdk-go-v2/config"
-	// "github.com/aws/aws-sdk-go-v2/service/dynamodb"
 )
 
 var (
