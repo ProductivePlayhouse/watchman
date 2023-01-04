@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components/macro"; // eslint-disable-line no-unused-vars
 import * as C from "../Components";
+import { HighestMatch } from "./HighestMatch";
 import { SDNS } from "./SDN";
 import { AltNames } from "./AltNames";
 import { Addresses } from "./Addresses";
@@ -26,6 +27,7 @@ const render = ({ data }) => {
   if (isNilOrEmpty(results)) return null;
   return (
     <C.Container>
+      <HighestMatch data={results.highestMatch} />
       <SDNS data={results.SDNs} />
       <AltNames data={results.altNames} />
       <Addresses data={results.addresses} />
