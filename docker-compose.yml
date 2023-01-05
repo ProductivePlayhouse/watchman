@@ -1,5 +1,25 @@
-version: '3'
+version: "3"
 services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - 8084:443
+    restart: always
+    networks:
+      - intranet    
+    volumes:
+      - ./nginx/conf/:/etc/nginx/conf.d/:ro
+      - ./certbot/www:/var/www/certbot/:ro
+      - ./certbot/conf/:/etc/nginx/ssl/:ro
+
+  certbot:
+    image: certbot/certbot:latest
+    networks:
+      - intranet    
+    volumes:
+      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw
+      
   mysql:
     image: mysql:8-oracle
     restart: always
@@ -13,7 +33,7 @@ services:
     networks:
       - intranet
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
     tmpfs: # Run this mysql in memory as its used for testing
@@ -22,7 +42,6 @@ services:
   watchman:
     build: .
     environment:
-#      - INITIAL_DATA_DIRECTORY=/data/
       - DATABASE_TYPE=mysql
       - MYSQL_ADDRESS=tcp(mysql:3306)
       - MYSQL_DATABASE=watchman
@@ -31,10 +50,8 @@ services:
       - MYSQL_ROOT_PASSWORD=root
     networks:
       - intranet
-#    volumes:
-#      - ./test/testdata/:/data/
-    ports:
-      - "8084:8084"
-      - "9094:9094"
+    expose:
+      - "8084"
+      - "9094"
 networks:
   intranet: {}
