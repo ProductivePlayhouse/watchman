@@ -3,8 +3,8 @@ services:
   mysql:
     image: mysql:8-oracle
     restart: always
-    ports:
-      - "3306:3306"
+    expose:
+      - "3306"
     environment:
       - MYSQL_DATABASE=watchman
       - MYSQL_USER=watchman
@@ -33,7 +33,7 @@ services:
     expose:
       - "8084"
       - "9094"
-      
+
 networks:
-  docker-nginx_intranet: 
+  docker-nginx_intranet:
     external: true
