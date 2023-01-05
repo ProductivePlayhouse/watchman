@@ -11,7 +11,7 @@ services:
       - MYSQL_PASSWORD=watchman
       - MYSQL_ROOT_PASSWORD=root
     networks:
-      - intranet
+      - docker-nginx_intranet
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
@@ -29,9 +29,11 @@ services:
       - MYSQL_PASSWORD=watchman
       - MYSQL_ROOT_PASSWORD=root
     networks:
-      - intranet
+      - docker-nginx_intranet
     expose:
       - "8084"
       - "9094"
+      
 networks:
-  intranet: {}
+  docker-nginx_intranet: 
+    external: true
