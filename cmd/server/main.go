@@ -28,7 +28,6 @@ import (
 	"github.com/moov-io/watchman/internal/database"
 
 	"github.com/gorilla/mux"
-	"github.com/golang-jwt/jwt"
 )
 
 var (
