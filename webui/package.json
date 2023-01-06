@@ -12,14 +12,15 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-scripts": "^5.0.1",
+    "stream-browserify": "^3.0.0",
     "winston": "3.8.1"
   },
   "scripts": {
-    "build": "react-scripts build",
+    "build": "react-app-rewired build",
     "watchman-server": "docker run -p 8084:8084 -p 9094:9094 -it moov/watchman:latest",
     "server": "node server/index.js",
-    "start": "react-scripts --openssl-legacy-provider start",
-    "test": "react-scripts test"
+    "start": "react-app-rewired --openssl-legacy-provider start",
+    "test": "react-app-rewired test"
   },
   "eslintConfig": {
     "extends": "react-app"
