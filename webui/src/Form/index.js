@@ -48,7 +48,7 @@ const initialValues = {
   limit: 10,
   q: "",
   sdnType: "",
-  program: ""
+  program: "",
   // disabled ///////////
   // idNumber: "",
   // list: "All",
@@ -62,13 +62,13 @@ export default ({ onSubmit, onReset }) => {
   const { values: typeOptionValues } = useTypeOptions();
   const { values: programOptionValues } = useProgramOptions();
 
-  const handleChange = name => e => {
+  const handleChange = (name) => (e) => {
     const value = R.path(["target", "value"], e);
-    setValues(values => R.assoc(name, value, values));
+    setValues((values) => R.assoc(name, value, values));
   };
 
-  const handleChangeSlider = name => (e, value) => {
-    setValues(values => R.assoc(name, value, values));
+  const handleChangeSlider = (name) => (e, value) => {
+    setValues((values) => R.assoc(name, value, values));
   };
 
   const handleSearchClick = () => {
@@ -88,7 +88,7 @@ export default ({ onSubmit, onReset }) => {
     if (!search) {
       return;
     }
-    setValues(values => {
+    setValues((values) => {
       const newValues = R.mergeDeepRight(values, parseQueryString(search));
       submit(newValues);
       return newValues;
@@ -98,23 +98,31 @@ export default ({ onSubmit, onReset }) => {
   return (
     <Container>
       <form
-        onSubmit={e => {
+        onSubmit={(e) => {
           e.preventDefault();
           handleSearchClick();
         }}
       >
         <C.Section>
           <C.SectionTitle>Search</C.SectionTitle>
+          <Cell>
+            <TextInput
+              label="API Key"
+              id="apiKey"
+              value={values["apiKey"]}
+              onChange={handleChange("apiKey")}
+            />
+          </Cell>
           <TwoColumns>
             <div>
-              <Cell>
+              {/* <Cell>
                 <TextInput
                   label="Name | Alt | Address"
                   id="q"
                   value={values["q"]}
                   onChange={handleChange("q")}
                 />
-              </Cell>
+              </Cell> */}
               <Cell>
                 <TextInput
                   label="Name"

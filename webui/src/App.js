@@ -7,6 +7,7 @@ import { Container } from "Components";
 import { buildQueryString, isNilOrEmpty } from "utils";
 import { search } from "api";
 import { createBrowserHistory } from "history";
+import jwt from "jsonwebtoken";
 
 const history = createBrowserHistory();
 
@@ -50,10 +51,10 @@ const valuesOnlyContainLimit = R.pipe(
 
 function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const executeSearch = async (qs) => {
+  const executeSearch = async (qs, apiKey) => {
     dispatch({ type: "SEARCH_INIT" });
     try {
-      const payload = await search(qs);
+      const payload = await search(qs, apiKey);
       dispatch({ type: "SEARCH_SUCCESS", payload });
     } catch (err) {
       dispatch({ type: "SEARCH_ERROR", payload: err });
@@ -67,7 +68,24 @@ function App() {
 
   const handleSubmit = (values) => {
     if (valuesOnlyContainLimit(values)) return;
-    const qs = buildQueryString(values);
+
+    // Extract API key from values and include in a token
+    const apiKey = values.apiKey;
+    const payload = {};
+    const token = jwt.sign(payload, apiKey);
+
+    // Set token expiration
+    const d = new Date();
+    const days = 7;
+    d.setTime(d.getTime() + 24 * 60 * 60 * 1000 * days);
+
+    // Save the token to a cookie
+    document.cookie = `jwt=${token};path=/;expires=${d.toGMTString()};`;
+
+    // Create a version of values that does not include apiKey
+    const valuesWithoutApiKey = R.omit(["apiKey"], values);
+
+    const qs = buildQueryString(valuesWithoutApiKey);
     history.push({ ...history.location, search: qs });
     executeSearch(qs);
   };

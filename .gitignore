@@ -31,3 +31,6 @@ webui/build/
 webui/node_modules/
 
 makefile.dev
+
+# Environment files
+.env

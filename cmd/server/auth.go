@@ -1,0 +1,48 @@
+package main
+
+import (
+	"context"
+	"errors"
+	"net/http"
+	"os"
+	"strings"
+
+	"github.com/golang-jwt/jwt"
+)
+
+func withAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Get the JWT from the "Authorization" header
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+		if tokenString == "" {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		// Parse the JWT
+		secret := os.Getenv("MY_SECRET")
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			// Validate the algorithm used to sign the JWT
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, errors.New("invalid signing method")
+			}
+			// Return the secret
+			return []byte(secret), nil
+		})
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		// Check if the JWT is valid
+		if !token.Valid {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		// Call the next handler
+		next.ServeHTTP(w, r)
+	})
+}

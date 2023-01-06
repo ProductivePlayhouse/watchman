@@ -37,11 +37,16 @@ var (
 )
 
 // TODO: modify existing search endpoint with additional eu info and add an eu only endpoint
+// PPH MODIFIED
 func addSearchRoutes(logger log.Logger, r *mux.Router, searcher *searcher) {
-	r.Methods("GET").Path("/search").HandlerFunc(search(logger, searcher))
-	r.Methods("GET").Path("/search/us-csl").HandlerFunc(searchUSCSL(logger, searcher))
-	r.Methods("GET").Path("/search/eu-csl").HandlerFunc(searchEUCSL(logger, searcher))
-	r.Methods("GET").Path("/search/uk-csl").HandlerFunc(searchUKCSL(logger, searcher))
+	// r.Methods("GET").Path("/search").HandlerFunc(search(logger, searcher))
+	// r.Methods("GET").Path("/search/us-csl").HandlerFunc(searchUSCSL(logger, searcher))
+	// r.Methods("GET").Path("/search/eu-csl").HandlerFunc(searchEUCSL(logger, searcher))
+	// r.Methods("GET").Path("/search/uk-csl").HandlerFunc(searchUKCSL(logger, searcher))
+	r.Methods("GET").Path("/search").Handler(withAuth(http.HandlerFunc(search(logger, searcher))))
+	r.Methods("GET").Path("/search/us-csl").Handler(withAuth(http.HandlerFunc(searchUSCSL(logger, searcher))))
+	r.Methods("GET").Path("/search/eu-csl").Handler(withAuth(http.HandlerFunc(searchEUCSL(logger, searcher))))
+	r.Methods("GET").Path("/search/uk-csl").Handler(withAuth(http.HandlerFunc(searchUKCSL(logger, searcher))))
 }
 
 func extractSearchLimit(r *http.Request) int {
