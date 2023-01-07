@@ -7,9 +7,25 @@ import { Container } from "Components";
 import { buildQueryString, isNilOrEmpty } from "utils";
 import { search } from "api";
 import { createBrowserHistory } from "history";
-import jwt from "jsonwebtoken";
+import * as jose from "jose";
+import Cookies from "js-cookie";
 
 const history = createBrowserHistory();
+
+const createJWT = async (apiKey) => {
+  const secret = new TextEncoder().encode(apiKey);
+  const alg = "HS256";
+
+  const jwt = await new jose.SignJWT({ "urn:example:claim": true })
+    .setProtectedHeader({ alg })
+    .setIssuedAt()
+    .setIssuer("urn:example:issuer")
+    .setAudience("urn:example:audience")
+    .setExpirationTime("24h")
+    .sign(secret);
+
+  return jwt;
+};
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -71,16 +87,10 @@ function App() {
 
     // Extract API key from values and include in a token
     const apiKey = values.apiKey;
-    const payload = {};
-    const token = jwt.sign(payload, apiKey);
-
-    // Set token expiration
-    const d = new Date();
-    const days = 7;
-    d.setTime(d.getTime() + 24 * 60 * 60 * 1000 * days);
+    const token = createJWT(apiKey);
 
     // Save the token to a cookie
-    document.cookie = `jwt=${token};path=/;expires=${d.toGMTString()};`;
+    Cookies.set("jwt", token, { expires: 1 });
 
     // Create a version of values that does not include apiKey
     const valuesWithoutApiKey = R.omit(["apiKey"], values);

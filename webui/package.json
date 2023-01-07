@@ -3,26 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "buffer": "^6.0.3",
-    "crypto-browserify": "^3.12.0",
     "express": "4.18.1",
     "express-winston": "3.4.0",
     "history": "4.10.1",
     "http-proxy-middleware": "0.21.0",
-    "jsonwebtoken": "^9.0.0",
+    "jose": "^4.11.2",
+    "js-cookie": "^3.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-scripts": "^5.0.1",
-    "stream-browserify": "^3.0.0",
-    "util": "^0.12.5",
     "winston": "3.8.1"
   },
   "scripts": {
-    "build": "react-app-rewired build",
+    "build": "react-scripts build",
     "watchman-server": "docker run -p 8084:8084 -p 9094:9094 -it moov/watchman:latest",
     "server": "node server/index.js",
-    "start": "react-app-rewired --openssl-legacy-provider start",
-    "test": "react-app-rewired test"
+    "start": "react-scripts --openssl-legacy-provider start",
+    "test": "react-scripts test"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -45,7 +42,6 @@
     "@material-ui/core": "4.12.4",
     "@material-ui/icons": "4.11.3",
     "ramda": "0.28.0",
-    "react-app-rewired": "^2.2.1",
     "styled-components": "4.4.1"
   }
 }
