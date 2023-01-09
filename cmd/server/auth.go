@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt"
+
+	"github.com/moov-io/base/log"	
 )
 
 func withAuth(logger log.Logger, next http.Handler) http.Handler {
