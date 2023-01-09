@@ -28,6 +28,8 @@ services:
       - MYSQL_USER=watchman
       - MYSQL_PASSWORD=watchman
       - MYSQL_ROOT_PASSWORD=root
+    env_file:
+      - .env
     networks:
       - docker-nginx_intranet
     expose:

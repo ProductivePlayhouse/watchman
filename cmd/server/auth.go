@@ -38,7 +38,7 @@ func withAuth(logger log.Logger, next http.Handler) http.Handler {
 		// 	return
 		// }
 
-		secret := os.Getenv("MY_SECRET")
+		secret := os.Getenv("API_KEY")
 		
 		// TEMP! INSECURE!
 		logger.Logf("Secret: %s", secret)
