@@ -147,8 +147,9 @@ func main() {
 	}
 	searcher := newSearcher(logger, pipeline, *flagWorkers)
 
+	// PPH DISABLED
 	// Add debug routes
-	adminServer.AddHandler(debugSDNPath, debugSDNHandler(logger, searcher))
+	// adminServer.AddHandler(debugSDNPath, debugSDNHandler(logger, searcher))
 
 	// Initial download of data
 	if stats, err := searcher.refreshData(os.Getenv("INITIAL_DATA_DIRECTORY")); err != nil {
@@ -200,16 +201,19 @@ func main() {
 		searcher.spawnResearching(logger, companyRepo, custRepo, watchRepo, webhookRepo)
 	})
 
+	// PPH DISABLED
 	// Add manual data refresh endpoint
-	adminServer.AddHandler(manualRefreshPath, manualRefreshHandler(logger, searcher, updates, downloadRepo))
+	// adminServer.AddHandler(manualRefreshPath, manualRefreshHandler(logger, searcher, updates, downloadRepo))
 
 	// Add searcher for HTTP routes
-	addCompanyRoutes(logger, router, searcher, companyRepo, watchRepo)
-	addCustomerRoutes(logger, router, searcher, custRepo, watchRepo)
-	addSDNRoutes(logger, router, searcher)
 	addSearchRoutes(logger, router, searcher)
-	addDownloadRoutes(logger, router, downloadRepo)
-	addValuesRoutes(logger, router, searcher)
+
+	// PPH DISABLED
+	// addCompanyRoutes(logger, router, searcher, companyRepo, watchRepo)
+	// addCustomerRoutes(logger, router, searcher, custRepo, watchRepo)
+	// addSDNRoutes(logger, router, searcher)	
+	// addDownloadRoutes(logger, router, downloadRepo)
+	// addValuesRoutes(logger, router, searcher)
 
 	// Setup our web UI to be served as well
 	setupWebui(logger, router, *flagBasePath)

@@ -13,16 +13,12 @@ import Cookies from "js-cookie";
 const history = createBrowserHistory();
 
 const createJWT = async (apiKey) => {
-  console.log("Creating JWT with API key: " + apiKey);
   const secret = new TextEncoder().encode(apiKey);
-  console.log("Secret: " + secret);
   const alg = "HS256";
 
+  // We set the JWT's issued at time to 1 minute ago to account for clock skew
   const time = new Date();
-  // Set time to 1 minute ago to account for clock skew
   time.setMinutes(time.getMinutes() - 1);
-
-  // Convert time to number
   const timeNum = time.getTime() / 1000;
 
   const jwt = await new jose.SignJWT({ "urn:example:claim": true })
