@@ -28,6 +28,9 @@ func withAuth(logger log.Logger, next http.Handler) http.Handler {
 		// Get the cookie value
 		cookieValue := tokenCookie.Value
 
+		// Log the cookie value
+		logger.Logf("Token cookie value: %s", cookieValue)
+
 		// tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		// if tokenString == "" {
 		// 	logger.LogErrorf("Request missing token from %s to %s", r.RemoteAddr, r.URL.Path)
