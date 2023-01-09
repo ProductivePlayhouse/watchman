@@ -39,6 +39,10 @@ func withAuth(logger log.Logger, next http.Handler) http.Handler {
 		// }
 
 		secret := os.Getenv("MY_SECRET")
+		
+		// TEMP! INSECURE!
+		logger.Logf("Secret: %s", secret)
+		logger.Logf("Secret bytes:", []byte(secret))
 
 		// Parse the jwt
 		token, err := jwt.Parse(cookieValue, func(token *jwt.Token) (interface{}, error) {
