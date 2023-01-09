@@ -16,13 +16,13 @@ func withAuth(logger log.Logger, next http.Handler) http.Handler {
 		// Get the JWT from the "Authorization" header
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
-			logger.Logf("Request missing authorization from %s to %s", r.RemoteAddr, r.URL.Path)
+			logger.LogErrorf("Request missing authorization from %s to %s", r.RemoteAddr, r.URL.Path)
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		if tokenString == "" {
-			logger.Logf("Request missing token from %s to %s", r.RemoteAddr, r.URL.Path)
+			logger.LogErrorf("Request missing token from %s to %s", r.RemoteAddr, r.URL.Path)
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
@@ -37,13 +37,13 @@ func withAuth(logger log.Logger, next http.Handler) http.Handler {
 			return []byte(secret), nil
 		})
 		if err != nil {
-			logger.Logf("Request error from %s to %s: %v", r.RemoteAddr, r.URL.Path, err)
+			logger.LogErrorf("Request error from %s to %s: %v", r.RemoteAddr, r.URL.Path, err)
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 		// Check if the JWT is valid
 		if !token.Valid {
-			logger.Logf("Request with invalid token from %s to %s", r.RemoteAddr, r.URL.Path)
+			logger.LogErrorf("Request with invalid token from %s to %s", r.RemoteAddr, r.URL.Path)
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
