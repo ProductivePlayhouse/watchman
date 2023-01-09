@@ -13,14 +13,22 @@ import (
 
 func withAuth(logger log.Logger, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Get the JWT from the "Authorization" header
-		authHeader := r.Header.Get("Authorization")
-		if authHeader == "" {
-			logger.LogErrorf("Request missing authorization from %s to %s", r.RemoteAddr, r.URL.Path)
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
+		// Get token from cookie
+		tokenCookie, err := r.Cookie("token")
+		if err != nil {
+			log.Fatalf("Error occured while reading cookie")
 		}
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+		tokenString := tokenCookie.Value
+		logger.Logf("Token from cookie: %s", tokenString)
+
+		// // Get the JWT from the "Authorization" header
+		// authHeader := r.Header.Get("Authorization")
+		// if authHeader == "" {
+		// 	logger.LogErrorf("Request missing authorization from %s to %s", r.RemoteAddr, r.URL.Path)
+		// 	http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		// 	return
+		// }
+		// tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		if tokenString == "" {
 			logger.LogErrorf("Request missing token from %s to %s", r.RemoteAddr, r.URL.Path)
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)

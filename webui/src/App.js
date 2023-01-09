@@ -90,7 +90,7 @@ function App() {
     const token = createJWT(apiKey);
 
     // Save the token to a cookie
-    Cookies.set("Authorization", token, { expires: 1 });
+    Cookies.set("token", token, { expires: 1 });
 
     // Create a version of values that does not include apiKey
     const valuesWithoutApiKey = R.omit(["apiKey"], values);
