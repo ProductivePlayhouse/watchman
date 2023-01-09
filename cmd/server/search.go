@@ -74,7 +74,6 @@ type searcher struct {
 	logger log.Logger
 }
 
-// TODO: PPH: ADD DYNAMODB
 func newSearcher(logger log.Logger, pipeline *pipeliner, workers int) *searcher {
 	logger.Logf("allowing only %d workers for search", workers)
 	return &searcher{
