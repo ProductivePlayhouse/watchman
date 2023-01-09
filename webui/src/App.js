@@ -18,9 +18,16 @@ const createJWT = async (apiKey) => {
   console.log("Secret: " + secret);
   const alg = "HS256";
 
+  const time = new Date();
+  // Set time to 1 minute ago to account for clock skew
+  time.setMinutes(time.getMinutes() - 1);
+
+  // Convert time to number
+  const timeNum = time.getTime() / 1000;
+
   const jwt = await new jose.SignJWT({ "urn:example:claim": true })
     .setProtectedHeader({ alg })
-    .setIssuedAt()
+    .setIssuedAt(timeNum)
     .setIssuer("urn:example:issuer")
     .setAudience("urn:example:audience")
     .setExpirationTime("24h")
