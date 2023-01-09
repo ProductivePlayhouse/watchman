@@ -16,7 +16,14 @@ func withAuth(logger log.Logger, next http.Handler) http.Handler {
 		// Get token from cookie
 		tokenCookie, err := r.Cookie("token")
 		if err != nil {
-			log.Fatalf("Error occured while reading cookie")
+			if err == http.ErrNoCookie {
+				logger.LogErrorf("No cookie found")
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}			
+			logger.LogErrorf("Error occured while reading cookie")
+			http.Error(w, "Bad Request", http.StatusBadRequest)			
+			return
 		}
 		tokenString := tokenCookie.Value
 		logger.Logf("Token from cookie: %s", tokenString)
