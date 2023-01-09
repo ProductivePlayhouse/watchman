@@ -12,17 +12,21 @@ import Cookies from "js-cookie";
 
 const history = createBrowserHistory();
 
-const createJWT = (apiKey) => {
+const createJWT = async (apiKey) => {
+  console.log("Creating JWT with API key: " + apiKey);
   const secret = new TextEncoder().encode(apiKey);
+  console.log("Secret: " + secret);
   const alg = "HS256";
 
-  const jwt = new jose.SignJWT({ "urn:example:claim": true })
+  const jwt = await new jose.SignJWT({ "urn:example:claim": true })
     .setProtectedHeader({ alg })
     .setIssuedAt()
     .setIssuer("urn:example:issuer")
     .setAudience("urn:example:audience")
     .setExpirationTime("24h")
     .sign(secret);
+
+  console.log("JWT: " + jwt);
 
   return jwt;
 };
@@ -82,12 +86,12 @@ function App() {
     history.push({ ...history.location, search: "" });
   };
 
-  const handleSubmit = (values) => {
+  const handleSubmit = async (values) => {
     if (valuesOnlyContainLimit(values)) return;
 
     // Extract API key from values and include in a token
     const apiKey = values.apiKey;
-    const token = createJWT(apiKey);
+    const token = await createJWT(apiKey);
 
     // Save the token to a cookie
     Cookies.set("token", token, { expires: 1 });
