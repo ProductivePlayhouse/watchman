@@ -12,11 +12,11 @@ import Cookies from "js-cookie";
 
 const history = createBrowserHistory();
 
-const createJWT = async (apiKey) => {
+const createJWT = (apiKey) => {
   const secret = new TextEncoder().encode(apiKey);
   const alg = "HS256";
 
-  const jwt = await new jose.SignJWT({ "urn:example:claim": true })
+  const jwt = new jose.SignJWT({ "urn:example:claim": true })
     .setProtectedHeader({ alg })
     .setIssuedAt()
     .setIssuer("urn:example:issuer")

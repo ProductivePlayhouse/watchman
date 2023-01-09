@@ -13,7 +13,7 @@ import (
 
 func withAuth(logger log.Logger, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Get token from cookie
+		// Retrieve cookie from request
 		tokenCookie, err := r.Cookie("token")
 		if err != nil {
 			if err == http.ErrNoCookie {
@@ -25,25 +25,20 @@ func withAuth(logger log.Logger, next http.Handler) http.Handler {
 			http.Error(w, "Bad Request", http.StatusBadRequest)			
 			return
 		}
-		tokenString := tokenCookie.Value
-		logger.Logf("Token from cookie: %s", tokenString)
+		// Get the cookie value
+		cookieValue := tokenCookie.Value
 
-		// // Get the JWT from the "Authorization" header
-		// authHeader := r.Header.Get("Authorization")
-		// if authHeader == "" {
-		// 	logger.LogErrorf("Request missing authorization from %s to %s", r.RemoteAddr, r.URL.Path)
+		// tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+		// if tokenString == "" {
+		// 	logger.LogErrorf("Request missing token from %s to %s", r.RemoteAddr, r.URL.Path)
 		// 	http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		// 	return
 		// }
-		// tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		if tokenString == "" {
-			logger.LogErrorf("Request missing token from %s to %s", r.RemoteAddr, r.URL.Path)
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-		// Parse the JWT
+
 		secret := os.Getenv("MY_SECRET")
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+
+		// Parse the jwt
+		token, err := jwt.Parse(cookieValue, func(token *jwt.Token) (interface{}, error) {
 			// Validate the algorithm used to sign the JWT
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, errors.New("invalid signing method")
@@ -52,10 +47,16 @@ func withAuth(logger log.Logger, next http.Handler) http.Handler {
 			return []byte(secret), nil
 		})
 		if err != nil {
+			if err == jwt.ErrSignatureInvalid {
+				logger.LogErrorf("Request with invalid signature from %s to %s", r.RemoteAddr, r.URL.Path)
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
 			logger.LogErrorf("Request error from %s to %s: %v", r.RemoteAddr, r.URL.Path, err)
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
+
 		// Check if the JWT is valid
 		if !token.Valid {
 			logger.LogErrorf("Request with invalid token from %s to %s", r.RemoteAddr, r.URL.Path)
