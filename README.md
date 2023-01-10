@@ -7,6 +7,7 @@ Create a .env file in the root directory with the following variables:
 ```bash
 API_KEY
 WATCHMAN_REPO # with ECR repo
+AWS_REGION
 ```
 
 [![Moov Banner Logo](https://user-images.githubusercontent.com/20115216/104214617-885b3c80-53ec-11eb-8ce0-9fc745fb5bfc.png)](https://github.com/moov-io)
