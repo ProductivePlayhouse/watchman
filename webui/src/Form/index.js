@@ -113,112 +113,25 @@ export default ({ onSubmit, onReset }) => {
               onChange={handleChange("apiKey")}
             />
           </Cell>
-          <TwoColumns>
-            <div>
-              {/* <Cell>
-                <TextInput
-                  label="Name | Alt | Address"
-                  id="q"
-                  value={values["q"]}
-                  onChange={handleChange("q")}
-                />
-              </Cell> */}
-              <Cell>
-                <TextInput
-                  label="Name"
-                  id="name"
-                  value={values["name"]}
-                  onChange={handleChange("name")}
-                />
-              </Cell>
-              <Cell>
-                <TextInput
-                  label="Alt Name"
-                  id="altName"
-                  value={values["altName"]}
-                  onChange={handleChange("altName")}
-                />
-              </Cell>
-              <Cell>
-                <Select
-                  label="Type"
-                  id="sdnType"
-                  value={values["sdnType"]}
-                  onChange={handleChange("sdnType")}
-                  options={typeOptionValues}
-                />
-              </Cell>
-              <Cell>
-                <Select
-                  label="OFAC Program"
-                  id="ofacProgram"
-                  value={values["ofacProgram"]}
-                  onChange={handleChange("ofacProgram")}
-                  options={programOptionValues}
-                />
-              </Cell>
-              <Cell>
-                <TextInput
-                  type="number"
-                  label="Limit"
-                  id="limit"
-                  value={values["limit"]}
-                  onChange={handleChange("limit")}
-                />
-              </Cell>
-            </div>
-            <div>
-              <Cell>
-                <TextInput
-                  label="Address"
-                  id="address"
-                  value={values["address"]}
-                  onChange={handleChange("address")}
-                />
-              </Cell>
-              <Cell>
-                <TextInput
-                  label="City"
-                  id="city"
-                  value={values["city"]}
-                  onChange={handleChange("city")}
-                />
-              </Cell>
-              <Cell>
-                <TextInput
-                  label="State"
-                  id="state"
-                  value={values["state"]}
-                  onChange={handleChange("state")}
-                />
-              </Cell>
-              <Cell>
-                <TextInput
-                  label="Providence"
-                  id="providence"
-                  value={values["providence"]}
-                  onChange={handleChange("providence")}
-                />
-              </Cell>
-              <Cell>
-                <Select
-                  label="Country"
-                  id="country"
-                  value={values["country"]}
-                  onChange={handleChange("country")}
-                  options={countryOptionData}
-                />
-              </Cell>
-              <Cell>
-                <TextInput
-                  label="Postal Code"
-                  id="zip"
-                  value={values["zip"]}
-                  onChange={handleChange("zip")}
-                />
-              </Cell>
-            </div>
-          </TwoColumns>
+          <div>
+            <Cell>
+              <TextInput
+                label="Name"
+                id="name"
+                value={values["name"]}
+                onChange={handleChange("name")}
+              />
+            </Cell>
+            <Cell>
+              <TextInput
+                type="number"
+                label="Limit"
+                id="limit"
+                value={values["limit"]}
+                onChange={handleChange("limit")}
+              />
+            </Cell>
+          </div>
           <Cell>
             <ButtonSet>
               <Button variant="contained" color="primary" type="submit">
