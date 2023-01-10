@@ -11,7 +11,7 @@ COPY webui/ .
 RUN npm install --legacy-peer-deps
 RUN npm run build
 
-# Originally: registry1.dso.mil/ironbank/google/golang/golang-1.19:latest
+# Originally: registry1.dso.mil/ironbank/redhat/ubi/ubi8:latest
 FROM ${WATCHMAN_REPO}/ironbank/redhat/ubi/ubi8:latest
 ENV AWS_REGION=us-west-2
 WORKDIR /watchman
