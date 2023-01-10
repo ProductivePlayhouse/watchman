@@ -1,17 +1,17 @@
-FROM golang:1.19-bookworm as backend
+FROM golang:1.19-bullseye as backend
 WORKDIR /backend
 RUN apt-get update && apt-get upgrade -y && apt-get install make gcc g++
 COPY . .
 RUN go mod download
 RUN make build-server
 
-FROM node:18-bookworm as frontend
+FROM node:18-bullseye as frontend
 WORKDIR /frontend
 COPY webui/ .
 RUN npm install --legacy-peer-deps
 RUN npm run build
 
-FROM debian:stable-slim
+FROM debian:bookworm-slim
 ENV AWS_REGION=us-west-2
 WORKDIR /watchman
 RUN apt-get update && apt-get upgrade -y && apt-get install -y ca-certificates
