@@ -14,7 +14,9 @@ RUN npm run build
 FROM registry1.dso.mil/ironbank/google/golang/golang-1.19:latest
 ENV AWS_REGION=us-west-2
 WORKDIR /watchman
+USER root
 RUN dnf update -y && dnf upgrade -y && dnf -y install ca-certificates
+USER 1001
 COPY --from=backend /backend/bin/server /bin/server
 COPY --from=frontend /frontend/build/ /watchman/
 ENV WEB_ROOT=/watchman/
