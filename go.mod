@@ -16,7 +16,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gorilla/mux v1.8.0
 	github.com/lopezator/migrator v0.3.1
-	github.com/mattn/go-sqlite3 v1.14.15
+	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/moov-io/base v0.34.1
 	github.com/pariz/gountries v0.1.6
 	github.com/prometheus/client_golang v1.13.0
