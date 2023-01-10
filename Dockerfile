@@ -5,7 +5,7 @@ COPY . .
 RUN go mod download
 RUN make build-server
 
-FROM node:18-buster as frontend
+FROM node:18-bullseye as frontend
 WORKDIR /frontend
 COPY webui/ .
 RUN npm install --legacy-peer-deps
