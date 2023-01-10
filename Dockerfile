@@ -11,11 +11,7 @@ COPY webui/ .
 RUN npm install --legacy-peer-deps
 RUN npm run build
 
-ARG BASE_REGISTRY=registry1.dso.mil
-ARG BASE_IMAGE=ironbank/google/golang/golang-1.19
-ARG BASE_TAG=latest
-
-FROM ${BASE_REGISTRY}/${BASE_IMAGE}:${BASE_TAG}
+FROM registry1.dso.mil/ironbank/google/golang/golang-1.19:latest
 ENV AWS_REGION=us-west-2
 WORKDIR /watchman
 RUN dnf update -y && dnf upgrade -y && dnf -y install ca-certificates
