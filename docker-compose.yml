@@ -1,4 +1,4 @@
-version: "3"
+version: "3.7"
 services:
   mysql:
     image: mysql:8-oracle
@@ -20,7 +20,7 @@ services:
       - /var/lib/mysql
 
   watchman:
-    build: .
+    image: ${WATCHMAN_REPO}:latest
     environment:
       - DATABASE_TYPE=mysql
       - MYSQL_ADDRESS=tcp(mysql:3306)
