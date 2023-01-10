@@ -1,3 +1,5 @@
+docker system prune -f
+
 docker build -t watchman-prd . --no-cache
 
 # Get repo URI from WATCHMAN_REPO in .env
