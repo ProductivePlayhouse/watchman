@@ -6,7 +6,7 @@ Create a .env file in the root directory with the following variables:
 
 ```bash
 API_KEY
-WATCHMAN_REPO # with ECR repo
+CONTAINER_REPO
 AWS_REGION
 ```
 

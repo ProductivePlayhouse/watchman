@@ -20,7 +20,7 @@ services:
       - /var/lib/mysql
 
   watchman:
-    image: ${WATCHMAN_REPO}/watchman-prd:latest
+    image: ${CONTAINER_REPO}/watchman-prd:latest
     environment:
       - DATABASE_TYPE=mysql
       - MYSQL_ADDRESS=tcp(mysql:3306)
