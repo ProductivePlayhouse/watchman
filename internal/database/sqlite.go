@@ -18,7 +18,7 @@ import (
 
 	kitprom "github.com/go-kit/kit/metrics/prometheus"
 	"github.com/lopezator/migrator"
-	"github.com/mattn/go-sqlite3"
+	// "github.com/mattn/go-sqlite3"
 	stdprom "github.com/prometheus/client_golang/prometheus"
 )
 
@@ -92,49 +92,51 @@ type sqlite struct {
 }
 
 func (s *sqlite) Connect() (*sql.DB, error) {
-	if s.err != nil {
-		return nil, fmt.Errorf("sqlite had error %v", s.err)
-	}
+	return nil, fmt.Errorf("PPH Watchman no longer supports sqlite")
 
-	sqliteVersionLogOnce.Do(func() {
-		if v, _, _ := sqlite3.Version(); v != "" {
-			s.logger.Logf("sqlite version %s", v)
-		}
-	})
+	// if s.err != nil {
+	// 	return nil, fmt.Errorf("sqlite had error %v", s.err)
+	// }
 
-	db, err := sql.Open("sqlite3", s.path)
-	if err != nil {
-		return nil, err
-	}
-	if err := db.Ping(); err != nil {
-		return db, err
-	}
+	// sqliteVersionLogOnce.Do(func() {
+	// 	if v, _, _ := sqlite3.Version(); v != "" {
+	// 		s.logger.Logf("sqlite version %s", v)
+	// 	}
+	// })
 
-	// Migrate our database
-	opts := []migrator.Option{sqliteMigrations}
-	if s != nil {
-		opts = append(opts, migrator.WithLogger(newMigrationLogger(s.logger)))
-	}
-	mig, err := migrator.New(opts...)
-	if err != nil {
-		return db, err
-	}
-	if err := mig.Migrate(db); err != nil {
-		return db, err
-	}
+	// db, err := sql.Open("sqlite3", s.path)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// if err := db.Ping(); err != nil {
+	// 	return db, err
+	// }
 
-	// Spin up metrics only after everything works
-	go func() {
-		t := time.NewTicker(1 * time.Second)
-		for range t.C {
-			stats := db.Stats()
-			s.connections.With("state", "idle").Set(float64(stats.Idle))
-			s.connections.With("state", "inuse").Set(float64(stats.InUse))
-			s.connections.With("state", "open").Set(float64(stats.OpenConnections))
-		}
-	}()
+	// // Migrate our database
+	// opts := []migrator.Option{sqliteMigrations}
+	// if s != nil {
+	// 	opts = append(opts, migrator.WithLogger(newMigrationLogger(s.logger)))
+	// }
+	// mig, err := migrator.New(opts...)
+	// if err != nil {
+	// 	return db, err
+	// }
+	// if err := mig.Migrate(db); err != nil {
+	// 	return db, err
+	// }
 
-	return db, err
+	// // Spin up metrics only after everything works
+	// go func() {
+	// 	t := time.NewTicker(1 * time.Second)
+	// 	for range t.C {
+	// 		stats := db.Stats()
+	// 		s.connections.With("state", "idle").Set(float64(stats.Idle))
+	// 		s.connections.With("state", "inuse").Set(float64(stats.InUse))
+	// 		s.connections.With("state", "open").Set(float64(stats.OpenConnections))
+	// 	}
+	// }()
+
+	// return db, err
 }
 
 func sqliteConnection(logger log.Logger, path string) *sqlite {
@@ -191,8 +193,8 @@ func CreateTestSqliteDB(t *testing.T) *TestSQLiteDB {
 // for duplicate entries (violating a unique table constraint).
 func SqliteUniqueViolation(err error) bool {
 	match := strings.Contains(err.Error(), "UNIQUE constraint failed")
-	if e, ok := err.(sqlite3.Error); ok {
-		return match || e.Code == sqlite3.ErrConstraint
-	}
+	// if e, ok := err.(sqlite3.Error); ok {
+	// 	return match || e.Code == sqlite3.ErrConstraint
+	// }
 	return match
 }
