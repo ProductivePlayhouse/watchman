@@ -1,4 +1,4 @@
-FROM golang:1.19-buster as backend
+FROM golang:1.19-bullseye as backend
 WORKDIR /backend
 RUN apt-get update && apt-get upgrade -y && apt-get install make gcc g++
 COPY . .
