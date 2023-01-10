@@ -8,14 +8,15 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.17.3
 	github.com/aws/aws-sdk-go-v2/config v1.18.5
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.10.7
+	github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression v1.4.33
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.17.8
 	github.com/bbalet/stopwords v1.0.0
 	github.com/docker/docker v20.10.13+incompatible
 	github.com/go-kit/kit v0.12.0
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorilla/mux v1.8.0
 	github.com/lopezator/migrator v0.3.1
+	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/moov-io/base v0.34.1
 	github.com/pariz/gountries v0.1.6
 	github.com/prometheus/client_golang v1.13.0
@@ -45,6 +46,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
