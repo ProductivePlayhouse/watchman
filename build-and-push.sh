@@ -1,5 +1,7 @@
 docker system prune -f
 
+docker login registry1.dso.mil
+
 docker build -t watchman-prd . --no-cache
 
 # Get repo URI from WATCHMAN_REPO in .env
