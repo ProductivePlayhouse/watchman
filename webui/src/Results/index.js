@@ -7,8 +7,11 @@ import { AltNames } from "./AltNames";
 import { Addresses } from "./Addresses";
 import { DeniedPersons } from "./DeniedPersons";
 import { isNilOrEmpty } from "utils";
+// PPH addition
+import { SectoralSanctions } from "./SectoralSanctions";
 
-const render = ({ data }) => {
+const render = ({ data }) =>
+{
   const { loading, error, results } = data;
   if (loading)
     return (
@@ -32,6 +35,7 @@ const render = ({ data }) => {
       <AltNames data={results.altNames} />
       <Addresses data={results.addresses} />
       <DeniedPersons data={results.deniedPersons} />
+      <SectoralSanctions data={results.sectoralSanctions} />
     </C.Container>
   );
 };
