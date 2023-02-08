@@ -19,11 +19,15 @@ const Header = () => (
     <C.ResultHeader>Action</C.ResultHeader>
     <C.ResultHeader>Effective</C.ResultHeader>
     <C.ResultHeader>Expiration</C.ResultHeader>
+
+
+
     <C.ResultHeader>Match</C.ResultHeader>
   </div>
 );
 
-export const DeniedPersons = ({ data }) => {
+export const DeniedPersons = ({ data }) =>
+{
   if (!data) return null;
   return (
     <C.Section>
@@ -35,7 +39,8 @@ export const DeniedPersons = ({ data }) => {
   );
 };
 
-export const DeniedPerson = ({ data }) => {
+export const DeniedPerson = ({ data }) =>
+{
   // console.log("person: ", data);
   return (
     <div

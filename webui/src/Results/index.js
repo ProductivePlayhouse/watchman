@@ -8,7 +8,7 @@ import { Addresses } from "./Addresses";
 import { DeniedPersons } from "./DeniedPersons";
 import { isNilOrEmpty } from "utils";
 // PPH addition
-import { SectoralSanctions } from "./SectoralSanctionsOld";
+import { SectoralSanctions } from "./SectoralSanctions";
 
 const render = ({ data }) =>
 {
@@ -35,7 +35,6 @@ const render = ({ data }) =>
       <AltNames data={results.altNames} />
       <Addresses data={results.addresses} />
       <DeniedPersons data={results.deniedPersons} />
-      <h1>Sectoral Sanctions</h1>
       <SectoralSanctions data={results.sectoralSanctions} />
     </C.Container>
   );
