@@ -478,7 +478,7 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 				highestMatchDetails = string(matchJSON)
 			}
 			else {
-				highestMatchDetails := ""
+				highestMatchDetails = ""
 				logger.Error().LogErrorf("Error marshalling JSON: %v", err)
 			}
 		}
@@ -489,7 +489,7 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 				highestMatchDetails = string(matchJSON)
 			}
 			else {
-				highestMatchDetails := ""
+				highestMatchDetails = ""
 				logger.Error().LogErrorf("Error marshalling JSON: %v", err)
 			}
 		}
@@ -500,7 +500,7 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 				highestMatchDetails = string(matchJSON)
 			}
 			else {
-				highestMatchDetails := ""
+				highestMatchDetails = ""
 				logger.Error().LogErrorf("Error marshalling JSON: %v", err)
 			}
 		}
@@ -511,7 +511,7 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 				highestMatchDetails = string(matchJSON)
 			}
 			else {
-				highestMatchDetails := ""
+				highestMatchDetails = ""
 				logger.Error().LogErrorf("Error marshalling JSON: %v", err)
 			}
 		}
@@ -522,7 +522,7 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 				highestMatchDetails = string(matchJSON)
 			}
 			else {
-				highestMatchDetails := ""
+				highestMatchDetails = ""
 				logger.Error().LogErrorf("Error marshalling JSON: %v", err)
 			}
 		}
@@ -533,7 +533,7 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 				highestMatchDetails = string(matchJSON)
 			}
 			else {
-				highestMatchDetails := ""
+				highestMatchDetails = ""
 				logger.Error().LogErrorf("Error marshalling JSON: %v", err)
 			}
 		}
@@ -544,7 +544,7 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 				highestMatchDetails = string(matchJSON)
 			}
 			else {
-				highestMatchDetails := ""
+				highestMatchDetails = ""
 				logger.Error().LogErrorf("Error marshalling JSON: %v", err)
 			}
 		}
