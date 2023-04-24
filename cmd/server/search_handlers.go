@@ -476,8 +476,7 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 			matchJSON, err := json.Marshal(sdns[0])
 			if err == nil {
 				highestMatchDetails = string(matchJSON)
-			}
-			else {
+			} else {
 				highestMatchDetails = ""
 				logger.Error().LogErrorf("Error marshalling JSON: %v", err)
 			}
@@ -487,8 +486,7 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 			matchJSON, err := json.Marshal(altNames[0])
 			if err == nil {
 				highestMatchDetails = string(matchJSON)
-			}
-			else {
+			} else {
 				highestMatchDetails = ""
 				logger.Error().LogErrorf("Error marshalling JSON: %v", err)
 			}
@@ -498,8 +496,7 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 			matchJSON, err := json.Marshal(sectoralSanctions[0])
 			if err == nil {
 				highestMatchDetails = string(matchJSON)
-			}
-			else {
+			} else {
 				highestMatchDetails = ""
 				logger.Error().LogErrorf("Error marshalling JSON: %v", err)
 			}
@@ -509,8 +506,7 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 			matchJSON, err := json.Marshal(deniedPersons[0])
 			if err == nil {
 				highestMatchDetails = string(matchJSON)
-			}
-			else {
+			} else {
 				highestMatchDetails = ""
 				logger.Error().LogErrorf("Error marshalling JSON: %v", err)
 			}
@@ -520,8 +516,7 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 			matchJSON, err := json.Marshal(bisEntities[0])
 			if err == nil {
 				highestMatchDetails = string(matchJSON)
-			}
-			else {
+			} else {
 				highestMatchDetails = ""
 				logger.Error().LogErrorf("Error marshalling JSON: %v", err)
 			}
@@ -531,8 +526,7 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 			matchJSON, err := json.Marshal(eucsl[0])
 			if err == nil {
 				highestMatchDetails = string(matchJSON)
-			}
-			else {
+			} else {
 				highestMatchDetails = ""
 				logger.Error().LogErrorf("Error marshalling JSON: %v", err)
 			}
@@ -542,8 +536,7 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 			matchJSON, err := json.Marshal(ukcsl[0])
 			if err == nil {
 				highestMatchDetails = string(matchJSON)
-			}
-			else {
+			} else {
 				highestMatchDetails = ""
 				logger.Error().LogErrorf("Error marshalling JSON: %v", err)
 			}
