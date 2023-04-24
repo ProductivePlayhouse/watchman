@@ -21,11 +21,6 @@ import (
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/gorilla/mux"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
-
-	// "github.com/moov-io/watchman"
-	// "github.com/moov-io/watchman/internal/database"	
-	// "github.com/aws/aws-sdk-go-v2/config"	
-	// "github.com/aws/aws-sdk-go-v2/service/dynamodb"	
 )
 
 var (
@@ -487,50 +482,44 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 		if len(altNames) > 0 && altNames[0].match > highestMatch {
 			highestMatch = altNames[0].match
 			matchJSON, err := json.Marshal(altNames[0])
-			if err != nil {
-				logger.Log(fmt.Sprintf("error JSON marshalling match: %v", err))
+			if err == nil {
+				highestMatchDetails = string(matchJSON)
 			}
-			highestMatchDetails = string(matchJSON)
 		}
 		if len(sectoralSanctions) > 0 && sectoralSanctions[0].match > highestMatch {
 			highestMatch = sectoralSanctions[0].match
 			matchJSON, err := json.Marshal(sectoralSanctions[0])
-			if err != nil {
-				logger.Log(fmt.Sprintf("error JSON marshalling match: %v", err))
+			if err == nil {
+				highestMatchDetails = string(matchJSON)
 			}
-			highestMatchDetails = string(matchJSON)
 		}
 		if len(deniedPersons) > 0 && deniedPersons[0].match > highestMatch {
 			highestMatch = deniedPersons[0].match
 			matchJSON, err := json.Marshal(deniedPersons[0])
-			if err != nil {
-				logger.Log(fmt.Sprintf("error JSON marshalling match: %v", err))
+			if err == nil {
+				highestMatchDetails = string(matchJSON)
 			}
-			highestMatchDetails = string(matchJSON)
 		}
 		if len(bisEntities) > 0 && bisEntities[0].match > highestMatch {
 			highestMatch = bisEntities[0].match
 			matchJSON, err := json.Marshal(bisEntities[0])
-			if err != nil {
-				logger.Log(fmt.Sprintf("error JSON marshalling match: %v", err))
+			if err == nil {
+				highestMatchDetails = string(matchJSON)
 			}
-			highestMatchDetails = string(matchJSON)
 		}
 		if len(eucsl) > 0 && eucsl[0].match > highestMatch {
 			highestMatch = eucsl[0].match
 			matchJSON, err := json.Marshal(eucsl[0])
-			if err != nil {
-				logger.Log(fmt.Sprintf("error JSON marshalling match: %v", err))
+			if err == nil {
+				highestMatchDetails = string(matchJSON)
 			}
-			highestMatchDetails = string(matchJSON)
 		}
 		if len(ukcsl) > 0 && ukcsl[0].match > highestMatch {
 			highestMatch = ukcsl[0].match
 			matchJSON, err := json.Marshal(ukcsl[0])
-			if err != nil {
-				logger.Log(fmt.Sprintf("error JSON marshalling match: %v", err))
+			if err == nil {
+				highestMatchDetails = string(matchJSON)
 			}
-			highestMatchDetails = string(matchJSON)
 		}
 	
 		// PPH CHANGED
