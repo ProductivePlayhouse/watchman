@@ -160,6 +160,7 @@ type searchResponse struct {
 	Query   string       `json:"query" dynamodbav:"query"`
 	Datetime int64       `json:"datetime" dynamodbav:"datetime"` // unix timestamp
 	HighestMatch float64 `json:"highestMatch" dynamodbav:"highestMatch"`
+	HighestMatchDetails string `json:"highestMatchDetails" dynamodbav:"highestMatchDetails"`
 
 	// OFAC
 	SDNs      []*SDN    `json:"SDNs" dynamodbav:"SDNs"`
@@ -471,28 +472,65 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 		eucsl := searcher.TopEUCSL(limit, minMatch, nameSlug)
 		ukcsl := searcher.TopUKCSL(limit, minMatch, nameSlug)
 
+		// PPH Changed
 		highestMatch := 0.0
+		highestMatchDetails := ""
 
 		if len(sdns) > 0 && sdns[0].match > highestMatch {
 			highestMatch = sdns[0].match
+			matchJSON, err := json.Marshal(sdns[0])
+			if err != nil {
+				logger.Log(fmt.Sprintf("error JSON marshalling match: %v", err))
+			}
+			highestMatchDetails = string(matchJSON)
 		}
 		if len(altNames) > 0 && altNames[0].match > highestMatch {
 			highestMatch = altNames[0].match
+			matchJSON, err := json.Marshal(altNames[0])
+			if err != nil {
+				logger.Log(fmt.Sprintf("error JSON marshalling match: %v", err))
+			}
+			highestMatchDetails = string(matchJSON)
 		}
 		if len(sectoralSanctions) > 0 && sectoralSanctions[0].match > highestMatch {
 			highestMatch = sectoralSanctions[0].match
+			matchJSON, err := json.Marshal(sectoralSanctions[0])
+			if err != nil {
+				logger.Log(fmt.Sprintf("error JSON marshalling match: %v", err))
+			}
+			highestMatchDetails = string(matchJSON)
 		}
 		if len(deniedPersons) > 0 && deniedPersons[0].match > highestMatch {
 			highestMatch = deniedPersons[0].match
+			matchJSON, err := json.Marshal(deniedPersons[0])
+			if err != nil {
+				logger.Log(fmt.Sprintf("error JSON marshalling match: %v", err))
+			}
+			highestMatchDetails = string(matchJSON)
 		}
 		if len(bisEntities) > 0 && bisEntities[0].match > highestMatch {
 			highestMatch = bisEntities[0].match
+			matchJSON, err := json.Marshal(bisEntities[0])
+			if err != nil {
+				logger.Log(fmt.Sprintf("error JSON marshalling match: %v", err))
+			}
+			highestMatchDetails = string(matchJSON)
 		}
 		if len(eucsl) > 0 && eucsl[0].match > highestMatch {
 			highestMatch = eucsl[0].match
+			matchJSON, err := json.Marshal(eucsl[0])
+			if err != nil {
+				logger.Log(fmt.Sprintf("error JSON marshalling match: %v", err))
+			}
+			highestMatchDetails = string(matchJSON)
 		}
 		if len(ukcsl) > 0 && ukcsl[0].match > highestMatch {
 			highestMatch = ukcsl[0].match
+			matchJSON, err := json.Marshal(ukcsl[0])
+			if err != nil {
+				logger.Log(fmt.Sprintf("error JSON marshalling match: %v", err))
+			}
+			highestMatchDetails = string(matchJSON)
 		}
 	
 		// PPH CHANGED
@@ -501,6 +539,7 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 			Query: nameSlug,
 			Datetime: searcher.lastRefreshedAt.Unix(),
 			HighestMatch: highestMatch,
+			HighestMatchDetails: highestMatchDetails,
 			// OFAC
 			SDNs:              sdns,
 			AltNames:          altNames,
