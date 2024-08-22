@@ -1,12 +1,24 @@
 import React from "react";
 import * as R from "ramda";
+import styled from "styled-components/macro"; // eslint-disable-line no-unused-vars
 import { matchToPercent } from "../utils";
 import { Remarks } from "./Remarks";
 import * as C from "Components";
 
 export const Header = ({ withMatch = true }) => (
-  <div style={{ marginTop: "1em", width: "100%" }}>
-    <div style={{ width: "100%", display: "grid", gridTemplateColumns: withMatch ? `4em 2fr 1fr 1fr 4em` : `4em 2fr 1fr 1fr` }}>
+  <div
+    css={`
+      margin-top: 1em;
+      width: 100%;
+    `}
+  >
+    <div
+      css={`
+        width: 100%;
+        display: grid;
+        grid-template-columns: ${withMatch ? `4em 2fr 1fr 1fr 4em` : `4em 2fr 1fr 1fr`};
+      `}
+    >
       <C.ResultHeader>ID</C.ResultHeader>
       <C.ResultHeader>Address</C.ResultHeader>
       <C.ResultHeader>City</C.ResultHeader>
@@ -16,8 +28,7 @@ export const Header = ({ withMatch = true }) => (
   </div>
 );
 
-export const Addresses = ({ data }) =>
-{
+export const Addresses = ({ data }) => {
   if (!data) return null;
   return (
     <C.Section>
@@ -28,11 +39,31 @@ export const Addresses = ({ data }) =>
   );
 };
 
-export const Address = ({ data, displayId = "entityID" }) =>
-{
+export const Address = ({ data, displayId = "entityID" }) => {
   return (
-    <div style={{ paddingBottom: "1em", borderBottom: "1px solid #eee" }}>
-      <div style={{ display: "grid", gridTemplateColumns: data.match ? `4em 2fr 1fr 1fr 4em` : `4em 2fr 1fr 1fr`, paddingTop: "1em" }}>
+    <div
+      css={`
+        padding-bottom: 1em;
+        border-bottom: 1px solid #eee;
+        &:last-of-type {
+          border-bottom: 0px;
+        }
+        & > div {
+          border: 0px solid red;
+        }
+      `}
+    >
+      <div
+        css={`
+          display: grid;
+          grid-template-columns: ${data.match ? `4em 2fr 1fr 1fr 4em` : `4em 2fr 1fr 1fr`};
+          padding-top: 1em;
+          & > div {
+            margin-right: 1em;
+            text-transform: capitalize;
+          }
+        `}
+      >
         <div>{R.toLower(data[displayId])}</div>
         <div>{R.toLower(data.address)}</div>
         <div>{R.toLower(data.cityStateProvincePostalCode)}</div>

@@ -2,14 +2,19 @@ package csl
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestReadUK(t *testing.T) {
-	ukCSL, ukCSLMap, err := ReadUKFile(filepath.Join("..", "..", "test", "testdata", "ConList.csv"))
+func TestReadUKCSL(t *testing.T) {
+	fd, err := os.Open(filepath.Join("..", "..", "test", "testdata", "ConList.csv"))
+	if err != nil {
+		t.Error(err)
+	}
+	ukCSL, ukCSLMap, err := ReadUKCSLFile(fd)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -67,4 +72,38 @@ func TestReadUK(t *testing.T) {
 	assert.Equal(t, expectedLastUpdatedDate, testRow.LastUpdates[0])
 	assert.Equal(t, expectedUKSancListDate, testRow.SanctionListDates[0])
 	assert.Equal(t, expectedGroupID, testRow.GroupID)
+}
+
+func TestReadUKSanctionsList(t *testing.T) {
+	t.Setenv("WITH_UK_SANCTIONS_LIST", "false")
+
+	fd, err := os.Open(filepath.Join("..", "..", "test", "testdata", "UK_Sanctions_List.ods"))
+	if err != nil {
+		t.Error(err)
+	}
+	// test we don't err on parsing the content
+	totalReport, report, err := ReadUKSanctionsListFile(fd)
+	assert.NoError(t, err)
+
+	// test that we get something more than an empty sanctions list record
+	assert.NotEmpty(t, totalReport)
+	assert.NotEmpty(t, report)
+	assert.GreaterOrEqual(t, len(totalReport), 3728)
+
+	if record, ok := report["AFG0001"]; ok {
+		assert.Equal(t, "12/01/2022", record.LastUpdated)
+		assert.Equal(t, "12703", record.OFSIGroupID)
+		assert.Equal(t, "TAe.010", record.UNReferenceNumber)
+		assert.Equal(t, "HAJI KHAIRULLAH HAJI SATTAR MONEY EXCHANGE", record.Names[0])
+		assert.Len(t, record.Names, 9)
+		assert.Equal(t, "Primary Name", record.NameTitle)
+		assert.NotEmpty(t, record.NonLatinScriptNames)
+		assert.Equal(t, UKSLEntity, *record.EntityType)
+		assert.NotEmpty(t, record.Addresses)
+		assert.NotEmpty(t, record.StateLocalities)
+		assert.NotEmpty(t, record.AddressCountries)
+		assert.Empty(t, record.CountryOfBirth)
+	} else {
+		t.Fatal("record not found")
+	}
 }

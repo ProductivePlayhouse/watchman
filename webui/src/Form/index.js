@@ -48,7 +48,7 @@ const initialValues = {
   limit: 10,
   q: "",
   sdnType: "",
-  program: "",
+  program: ""
   // disabled ///////////
   // idNumber: "",
   // list: "All",
@@ -62,13 +62,13 @@ export default ({ onSubmit, onReset }) => {
   const { values: typeOptionValues } = useTypeOptions();
   const { values: programOptionValues } = useProgramOptions();
 
-  const handleChange = (name) => (e) => {
+  const handleChange = name => e => {
     const value = R.path(["target", "value"], e);
-    setValues((values) => R.assoc(name, value, values));
+    setValues(values => R.assoc(name, value, values));
   };
 
-  const handleChangeSlider = (name) => (e, value) => {
-    setValues((values) => R.assoc(name, value, values));
+  const handleChangeSlider = name => (e, value) => {
+    setValues(values => R.assoc(name, value, values));
   };
 
   const handleSearchClick = () => {
@@ -88,7 +88,7 @@ export default ({ onSubmit, onReset }) => {
     if (!search) {
       return;
     }
-    setValues((values) => {
+    setValues(values => {
       const newValues = R.mergeDeepRight(values, parseQueryString(search));
       submit(newValues);
       return newValues;
@@ -98,40 +98,119 @@ export default ({ onSubmit, onReset }) => {
   return (
     <Container>
       <form
-        onSubmit={(e) => {
+        onSubmit={e => {
           e.preventDefault();
           handleSearchClick();
         }}
       >
         <C.Section>
           <C.SectionTitle>Search</C.SectionTitle>
-          <Cell>
-            <TextInput
-              label="API Key"
-              id="apiKey"
-              value={values["apiKey"]}
-              onChange={handleChange("apiKey")}
-            />
-          </Cell>
-          <div>
-            <Cell>
-              <TextInput
-                label="Name"
-                id="name"
-                value={values["name"]}
-                onChange={handleChange("name")}
-              />
-            </Cell>
-            <Cell>
-              <TextInput
-                type="number"
-                label="Limit"
-                id="limit"
-                value={values["limit"]}
-                onChange={handleChange("limit")}
-              />
-            </Cell>
-          </div>
+          <TwoColumns>
+            <div>
+              <Cell>
+                <TextInput
+                  label="Name | Alt | Address"
+                  id="q"
+                  value={values["q"]}
+                  onChange={handleChange("q")}
+                />
+              </Cell>
+              <Cell>
+                <TextInput
+                  label="Name"
+                  id="name"
+                  value={values["name"]}
+                  onChange={handleChange("name")}
+                />
+              </Cell>
+              <Cell>
+                <TextInput
+                  label="Alt Name"
+                  id="altName"
+                  value={values["altName"]}
+                  onChange={handleChange("altName")}
+                />
+              </Cell>
+              <Cell>
+                <Select
+                  label="Type"
+                  id="sdnType"
+                  value={values["sdnType"]}
+                  onChange={handleChange("sdnType")}
+                  options={typeOptionValues}
+                />
+              </Cell>
+              <Cell>
+                <Select
+                  label="OFAC Program"
+                  id="ofacProgram"
+                  value={values["ofacProgram"]}
+                  onChange={handleChange("ofacProgram")}
+                  options={programOptionValues}
+                />
+              </Cell>
+              <Cell>
+                <TextInput
+                  type="number"
+                  label="Limit"
+                  id="limit"
+                  value={values["limit"]}
+                  onChange={handleChange("limit")}
+                />
+              </Cell>
+            </div>
+            <div>
+              <Cell>
+                <TextInput
+                  label="Address"
+                  id="address"
+                  value={values["address"]}
+                  onChange={handleChange("address")}
+                />
+              </Cell>
+              <Cell>
+                <TextInput
+                  label="City"
+                  id="city"
+                  value={values["city"]}
+                  onChange={handleChange("city")}
+                />
+              </Cell>
+              <Cell>
+                <TextInput
+                  label="State"
+                  id="state"
+                  value={values["state"]}
+                  onChange={handleChange("state")}
+                />
+              </Cell>
+              <Cell>
+                <TextInput
+                  label="Providence"
+                  id="providence"
+                  value={values["providence"]}
+                  onChange={handleChange("providence")}
+                />
+              </Cell>
+              <Cell>
+                <Select
+                  label="Country"
+                  id="country"
+                  value={values["country"]}
+                  onChange={handleChange("country")}
+                  options={countryOptionData}
+                />
+              </Cell>
+              <Cell>
+                <TextInput
+                  label="Postal Code"
+                  id="zip"
+                  value={values["zip"]}
+                  onChange={handleChange("zip")}
+                />
+              </Cell>
+            </div>
+          </TwoColumns>
           <Cell>
             <ButtonSet>
               <Button variant="contained" color="primary" type="submit">

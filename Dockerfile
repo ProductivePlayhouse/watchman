@@ -1,13 +1,13 @@
 ARG CONTAINER_REPO=registry1.dso.mil
 
-FROM golang:1.19-bullseye as backend
+FROM golang:1.20-bookworm as backend
 WORKDIR /backend
 RUN apt-get update && apt-get upgrade -y && apt-get install make gcc g++
 COPY . .
 RUN go mod download
 RUN make build-server
 
-FROM node:18-bullseye as frontend
+FROM node:22-bookworm as frontend
 WORKDIR /frontend
 COPY webui/ .
 RUN npm install --legacy-peer-deps

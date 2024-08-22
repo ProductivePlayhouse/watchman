@@ -28,7 +28,8 @@ func TestSearch__EU_CSL(t *testing.T) {
 	w.Flush()
 
 	require.Equal(t, http.StatusOK, w.Code)
-	require.Contains(t, w.Body.String(), `"match":0.7388888`)
+	require.Contains(t, w.Body.String(), `"match":0.92419`)
+	require.Contains(t, w.Body.String(), `"matchedName":"saddam hussein al tikriti"`)
 
 	var wrapper struct {
 		EUConsolidatedSanctionsList []csl.EUCSLRecord `json:"euConsolidatedSanctionsList"`

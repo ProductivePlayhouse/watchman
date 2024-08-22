@@ -4,17 +4,14 @@ import (
 	"encoding/csv"
 	"errors"
 	"io"
-	"os"
 	"strings"
 )
 
-func ReadFile(path string) (*CSL, error) {
-	fd, err := os.Open(path)
-	if err != nil {
-		return nil, err
+func ReadFile(fd io.ReadCloser) (*CSL, error) {
+	if fd == nil {
+		return nil, errors.New("CSL file is empty or missing")
 	}
 	defer fd.Close()
-
 	return Parse(fd)
 }
 
@@ -62,30 +59,30 @@ func Parse(r io.Reader) (*CSL, error) {
 				report.ISNs = append(report.ISNs, unmarshalISN(record, i))
 
 			case "AECA Debarred List": // TODO: Not found
-				// TODO(adam): https://github.com/SecurityPPH/watchman/issues/414
+				// TODO(adam): https://github.com/moov-io/watchman/issues/414
 
 			case "Foreign Sanctions Evaders (FSE) - Treasury Department":
-				// TODO(adam): https://github.com/SecurityPPH/watchman/issues/415
+				// TODO(adam): https://github.com/moov-io/watchman/issues/415
 				report.FSEs = append(report.FSEs, unmarshalFSE(record, i))
 
 			case "Palestinian Legislative Council List (PLC) - Treasury Department":
-				// TODO(adam): https://github.com/SecurityPPH/watchman/issues/416
+				// TODO(adam): https://github.com/moov-io/watchman/issues/416
 				report.PLCs = append(report.PLCs, unmarshalPLC(record, i))
 
 			case "Capta List (CAP) - Treasury Department":
-				// TODO(adam): https://github.com/SecurityPPH/watchman/issues/417
+				// TODO(adam): https://github.com/moov-io/watchman/issues/417
 				report.CAPs = append(report.CAPs, unmarshalCAP(record, i))
 
 			case "Non-SDN Menu-Based Sanctions List (NS-MBS List) - Treasury Department":
-				// TODO(adam): https://github.com/SecurityPPH/watchman/issues/418
+				// TODO(adam): https://github.com/moov-io/watchman/issues/418
 				report.NS_MBSs = append(report.NS_MBSs, unmarshalNS_MBS(record, i))
 
 			case "Non-SDN Chinese Military-Industrial Complex Companies List (CMIC) - Treasury Department":
-				// TODO(adam): https://github.com/SecurityPPH/watchman/issues/419
+				// TODO(adam): https://github.com/moov-io/watchman/issues/419
 				report.CMICs = append(report.CMICs, unmarshalCMIC(record, i))
 
 			case "ITAR Debarred (DTC) - State Department":
-				// TODO(adam): https://github.com/SecurityPPH/watchman/issues/422
+				// TODO(adam): https://github.com/moov-io/watchman/issues/422
 				report.DTCs = append(report.DTCs, unmarshalDTC(record, i))
 
 			default:

@@ -1,3 +1,4 @@
+// PPH modified file
 import React from "react";
 import styled from "styled-components/macro"; // eslint-disable-line no-unused-vars
 import * as C from "../Components";
@@ -7,7 +8,6 @@ import { AltNames } from "./AltNames";
 import { Addresses } from "./Addresses";
 import { DeniedPersons } from "./DeniedPersons";
 import { isNilOrEmpty } from "utils";
-// PPH addition
 import { SectoralSanctions } from "./SectoralSanctions";
 
 const render = ({ data }) =>
