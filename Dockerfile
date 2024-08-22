@@ -7,7 +7,7 @@ COPY . .
 RUN go mod download
 RUN make build-server
 
-FROM node:22-bookworm as frontend
+FROM node:21-bookworm as frontend
 WORKDIR /frontend
 COPY webui/ .
 RUN npm install --legacy-peer-deps
