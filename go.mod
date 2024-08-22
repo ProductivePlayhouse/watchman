@@ -17,7 +17,7 @@ require (
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673
 	go4.org v0.0.0-20230225012048-214862532bf5
 	golang.org/x/oauth2 v0.14.0
-	golang.org/x/sync v0.6.0
+	golang.org/x/sync v0.8.0
 	golang.org/x/text v0.14.0
 )
 
@@ -28,6 +28,7 @@ require (
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
