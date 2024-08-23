@@ -17,7 +17,8 @@ FROM registry.access.redhat.com/ubi9/ubi-minimal:9.4
 ENV AWS_REGION=us-west-2
 WORKDIR /watchman
 USER root
-RUN dnf update -y && dnf upgrade -y && dnf -y install ca-certificates
+RUN microdnf update -y && \
+    microdnf install -y ca-certificates
 USER 1001
 COPY --from=backend /backend/bin/server /bin/server
 COPY --from=frontend /frontend/build/ /watchman/
