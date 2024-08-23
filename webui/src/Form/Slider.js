@@ -1,7 +1,7 @@
 import React from 'react';
-import styled from "styled-components/macro"; // eslint-disable-line no-unused-vars
-import MSlider from "@material-ui/core/Slider";
-import Typography from "@material-ui/core/Typography";
+import styled from "styled-components";
+import MSlider from "@mui/material/Slider";
+import Typography from "@mui/material/Typography";
 
 const render = ({ label, ...props }) => (
   <div

@@ -1,6 +1,6 @@
 import React from "react";
 import * as R from "ramda";
-import styled from "styled-components/macro"; // eslint-disable-line no-unused-vars
+import styled from "styled-components";
 import { matchToPercent } from "../utils";
 import { Remarks } from "./Remarks";
 import * as C from "Components";
@@ -28,7 +28,8 @@ export const Header = ({ withMatch = true }) => (
   </div>
 );
 
-export const Addresses = ({ data }) => {
+export const Addresses = ({ data }) =>
+{
   if (!data) return null;
   return (
     <C.Section>
@@ -39,7 +40,8 @@ export const Addresses = ({ data }) => {
   );
 };
 
-export const Address = ({ data, displayId = "entityID" }) => {
+export const Address = ({ data, displayId = "entityID" }) =>
+{
   return (
     <div
       css={`

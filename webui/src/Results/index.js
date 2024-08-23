@@ -1,6 +1,6 @@
 // PPH modified file
 import React from "react";
-import styled from "styled-components/macro"; // eslint-disable-line no-unused-vars
+import styled from "styled-components";
 import * as C from "../Components";
 import { HighestMatch } from "./HighestMatch";
 import { SDNS } from "./SDN";

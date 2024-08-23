@@ -1,15 +1,18 @@
+// PPH MODIFIED
 import React, { useReducer } from "react";
 import * as R from "ramda";
-import styled from "styled-components/macro"; // eslint-disable-line no-unused-vars
-import Form from "Form";
-import Results from "Results";
-import { Container } from "Components";
-import { buildQueryString, isNilOrEmpty } from "utils";
-import { search } from "api";
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { StyledEngineProvider } from '@mui/material/styles';
+import Form from "./Form";
+import Results from "./Results";
+import { Container } from "./Components";
+import { buildQueryString, isNilOrEmpty } from "./utils";
+import { search } from "./api";
 import { createBrowserHistory } from "history";
 import * as jose from "jose";
 import Cookies from "js-cookie";
-import StylesProvider from "./StylesProvider"; // Import the StylesProvider
+import theme from "./theme";
 
 const history = createBrowserHistory();
 
@@ -64,6 +67,7 @@ const reducer = (state, action) =>
       return state;
   }
 };
+
 const initialState = {
   error: null,
   loading: false,
@@ -118,58 +122,37 @@ function App()
   };
 
   return (
-    <div
-      css={`
-        width: 80vw;
-        margin: 1em auto;
-      `}
-    >
-      <Container>
-        <h1>PPH Watchman</h1>
-        <p>
-          PPH Watchman is a service which downloads, parses and indexes numerous trade, government
-          and non-profit lists of blocked individuals and entities to comply with those regions
-          laws.
-        </p>
-        <p>
-          <a
-            css={`
-              color: #0000ee;
-            `}
-            href="https://github.com/SecurityPPH/watchman"
-          >
-            GitHub
-          </a>{" "}
-          |&nbsp;
-          <a
-            css={`
-              color: #0000ee;
-            `}
-            href="https://moov-io.github.io/watchman/"
-          >
-            Documentation
-          </a>{" "}
-          |&nbsp;
-          <a
-            css={`
-              color: #0000ee;
-            `}
-            href="https://moov-io.github.io/watchman/api/"
-          >
-            API Endpoints
-          </a>
-        </p>
-      </Container>
-      <Form onSubmit={handleSubmit} onReset={handleReset} />
-      <Results data={state} />
-    </div>
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Container maxWidth="lg">
+          <div style={{ margin: '1em auto' }}>
+            <h1>PPH Watchman</h1>
+            <p>
+              PPH Watchman is a service which downloads, parses and indexes numerous trade, government
+              and non-profit lists of blocked individuals and entities to comply with those regions
+              laws.
+            </p>
+            <p>
+              <a href="https://github.com/SecurityPPH/watchman" style={{ color: '#0000ee' }}>
+                GitHub
+              </a>{" "}
+              |{" "}
+              <a href="https://moov-io.github.io/watchman/" style={{ color: '#0000ee' }}>
+                Documentation
+              </a>{" "}
+              |{" "}
+              <a href="https://moov-io.github.io/watchman/api/" style={{ color: '#0000ee' }}>
+                API Endpoints
+              </a>
+            </p>
+          </div>
+          <Form onSubmit={handleSubmit} onReset={handleReset} />
+          <Results data={state} />
+        </Container>
+      </ThemeProvider>
+    </StyledEngineProvider>
   );
 }
 
-const WrappedApp = () => (
-  <StylesProvider>
-    <App />
-  </StylesProvider>
-);
-
-export default WrappedApp;
+export default App;
