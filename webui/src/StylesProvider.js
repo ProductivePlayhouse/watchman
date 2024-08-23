@@ -3,12 +3,16 @@ import { StyleSheetManager } from 'styled-components';
 
 const StylesProvider = ({ children }) =>
 {
-    const nonce = window.cspNonce; // This is set by the script in index.html
+    const nonce = window.cspNonce === "__CSP_NONCE__" ? null : window.cspNonce;
 
-    return (
+    return nonce ? (
         <StyleSheetManager nonce={nonce}>
             {children}
         </StyleSheetManager>
+    ) : (
+        <>
+            {children}
+        </>
     );
 };
 

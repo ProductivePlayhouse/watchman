@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect } from "react";
 import * as R from "ramda";
-import styled from "styled-components/macro"; // eslint-disable-line no-unused-vars
-import MButton from "@material-ui/core/Button";
-import Container from "@material-ui/core/Container";
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
 import * as C from "../Components";
 import Select from "./Select";
 import TextInput from "./TextInput";
@@ -11,30 +10,23 @@ import { countryOptionData, listOptionData } from "./data";
 import { parseQueryString } from "utils";
 import { useTypeOptions, useProgramOptions } from "./options";
 
-const Button = styled(MButton)`
-  margin: 1em;
-`;
+const ButtonSet = ({ children }) => (
+  <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '1em' }}>
+    {children}
+  </div>
+);
 
-const ButtonSet = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  && > * {
-    margin-right: 1em;
-  }
-`;
+const Cell = ({ children }) => (
+  <div style={{ display: 'flex', alignItems: 'flex-end', marginBottom: '1em' }}>
+    {children}
+  </div>
+);
 
-const Cell = styled.div`
-  outline: 0px solid #eee;
-  display: flex;
-  align-items: flex-end;
-  margin-bottom: 1em;
-`;
-
-const TwoColumns = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: 1em 2em;
-`;
+const TwoColumns = ({ children }) => (
+  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1em 2em' }}>
+    {children}
+  </div>
+);
 
 const initialValues = {
   address: "",
@@ -49,46 +41,48 @@ const initialValues = {
   q: "",
   sdnType: "",
   program: ""
-  // disabled ///////////
-  // idNumber: "",
-  // list: "All",
-  // score: 100
 };
 
-// eslint-disable-next-line
-export default ({ onSubmit, onReset }) => {
+export default function Form({ onSubmit, onReset })
+{
   const [values, setValues] = React.useState(initialValues);
 
   const { values: typeOptionValues } = useTypeOptions();
   const { values: programOptionValues } = useProgramOptions();
 
-  const handleChange = name => e => {
+  const handleChange = name => e =>
+  {
     const value = R.path(["target", "value"], e);
     setValues(values => R.assoc(name, value, values));
   };
 
-  const handleChangeSlider = name => (e, value) => {
+  const handleChangeSlider = name => (e, value) =>
+  {
     setValues(values => R.assoc(name, value, values));
   };
 
-  const handleSearchClick = () => {
+  const handleSearchClick = () =>
+  {
     const activeValues = R.omit(["idNumber", "list", "score"])(values);
     onSubmit(activeValues);
   };
 
-  const handleResetClick = () => {
+  const handleResetClick = () =>
+  {
     setValues(initialValues);
     onReset();
   };
 
-  // eslint-disable-next-line
-  const submit = useCallback(onSubmit, []);
-  useEffect(() => {
+  const submit = useCallback(onSubmit, [onSubmit]);
+  useEffect(() =>
+  {
     const { search } = window.location;
-    if (!search) {
+    if (!search)
+    {
       return;
     }
-    setValues(values => {
+    setValues(values =>
+    {
       const newValues = R.mergeDeepRight(values, parseQueryString(search));
       submit(newValues);
       return newValues;
@@ -98,7 +92,8 @@ export default ({ onSubmit, onReset }) => {
   return (
     <Container>
       <form
-        onSubmit={e => {
+        onSubmit={e =>
+        {
           e.preventDefault();
           handleSearchClick();
         }}
@@ -216,39 +211,13 @@ export default ({ onSubmit, onReset }) => {
               <Button variant="contained" color="primary" type="submit">
                 Search
               </Button>
-              <Button variant="outlined" color="default" onClick={handleResetClick}>
+              <Button variant="outlined" color="primary" onClick={handleResetClick}>
                 Reset
               </Button>
             </ButtonSet>
           </Cell>
-          {false && (
-            <>
-              <Cell>
-                <Select
-                  disabled={true}
-                  label="List"
-                  id="list"
-                  value={values["list"]}
-                  onChange={handleChange("list")}
-                  options={listOptionData}
-                />
-              </Cell>
-              <Cell>
-                <Slider
-                  disabled={true}
-                  label="Score"
-                  id="score"
-                  value={values["score"]}
-                  onChange={handleChangeSlider("score")}
-                  min={0}
-                  max={100}
-                  valueLabelDisplay="auto"
-                />
-              </Cell>
-            </>
-          )}
         </C.Section>
       </form>
     </Container>
   );
-};
+}

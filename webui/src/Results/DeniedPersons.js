@@ -1,6 +1,6 @@
 import React from "react";
 import * as R from "ramda";
-import styled from "styled-components/macro"; // eslint-disable-line no-unused-vars
+import styled from "styled-components";
 import { matchToPercent } from "../utils";
 import { Remarks } from "./Remarks";
 import * as C from "../Components";
@@ -23,7 +23,8 @@ const Header = () => (
   </div>
 );
 
-export const DeniedPersons = ({ data }) => {
+export const DeniedPersons = ({ data }) =>
+{
   if (!data) return null;
   return (
     <C.Section>
@@ -35,7 +36,8 @@ export const DeniedPersons = ({ data }) => {
   );
 };
 
-export const DeniedPerson = ({ data }) => {
+export const DeniedPerson = ({ data }) =>
+{
   // console.log("person: ", data);
   return (
     <div

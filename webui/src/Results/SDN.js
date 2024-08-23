@@ -1,16 +1,16 @@
 import React, { useReducer } from "react";
 import * as R from "ramda";
-import styled, { css } from "styled-components/macro"; // eslint-disable-line no-unused-vars
+import styled, { css } from "styled-components";
 import { matchToPercent, isNilOrEmpty } from "utils";
 import { Remarks } from "./Remarks";
 import * as C from "Components";
 import { getSDNAlts, getSDNAddresses } from "api";
 import { SDNExpandDetails } from "./SDNDetails";
 
-import MExpansionPanel from "@material-ui/core/ExpansionPanel";
-import MExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
-import MExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const Header = () => (
   <div
@@ -36,7 +36,8 @@ const Header = () => (
   </div>
 );
 
-export const SDNS = ({ data }) => {
+export const SDNS = ({ data }) =>
+{
   if (!data) return null;
   return (
     <C.Section>
@@ -57,7 +58,7 @@ const row = css`
 `;
 
 // remote the 'isExpanded' prop to prevent it from being passed to React/DOM
-const FilterExpansionPanel = ({ isExpanded, ...props }) => <MExpansionPanel {...props} />;
+const FilterExpansionPanel = ({ isExpanded, ...props }) => <Accordion {...props} />;
 
 const ExpansionPanel = styled(FilterExpansionPanel)`
   && {
@@ -66,8 +67,8 @@ const ExpansionPanel = styled(FilterExpansionPanel)`
     border: 1px solid transparent;
     border-bottom: 1px solid #eee;
     ${({ isExpanded }) =>
-      isExpanded &&
-      `
+    isExpanded &&
+    `
         background-color: #f9f9f9;
         border: 1px solid #ddd;
         border-top-color: transparent;
@@ -86,12 +87,12 @@ const ExpansionPanel = styled(FilterExpansionPanel)`
   }
 `;
 
-const ExpansionPanelSummary = styled(MExpansionPanelSummary)`
+const ExpansionPanelSummary = styled(AccordionSummary)`
   && {
     padding: 0px;
   }
 `;
-const ExpansionPanelDetails = styled(MExpansionPanelDetails)`
+const ExpansionPanelDetails = styled(AccordionDetails)`
   && {
     padding: 0px;
   }
@@ -113,9 +114,11 @@ const initialState = {
   }
 };
 
-const reducer = (state, action) => {
+const reducer = (state, action) =>
+{
   // console.log("action: ", action);
-  switch (action.type) {
+  switch (action.type)
+  {
     case "EXPANDED_STATE":
       return R.assoc("expanded", action.value, state);
     case status.INIT:
@@ -132,10 +135,12 @@ const reducer = (state, action) => {
   }
 };
 
-export const SDN = ({ data }) => {
+export const SDN = ({ data }) =>
+{
   const [details, dispatch] = useReducer(reducer, initialState);
 
-  const handleExpandToggle = (_, expanded) => {
+  const handleExpandToggle = (_, expanded) =>
+  {
     dispatch({ type: "EXPANDED_STATE", value: expanded });
     if (details.loaded) return;
 

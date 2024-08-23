@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components/macro"; // eslint-disable-line no-unused-vars
+import styled from "styled-components";
 import { matchToPercent } from "../utils";
 import { Remarks } from "./Remarks";
 import * as C from "Components";
@@ -20,7 +20,8 @@ export const Header = ({ withMatch = true }) => (
   </div>
 );
 
-export const AltNames = ({ data }) => {
+export const AltNames = ({ data }) =>
+{
   if (!data) return null;
   return (
     <C.Section>
@@ -32,7 +33,8 @@ export const AltNames = ({ data }) => {
   );
 };
 
-export const AltName = ({ data, displayId = "entityID" }) => {
+export const AltName = ({ data, displayId = "entityID" }) =>
+{
   return (
     <div
       css={`
