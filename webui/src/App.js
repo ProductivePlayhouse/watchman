@@ -9,10 +9,12 @@ import { search } from "api";
 import { createBrowserHistory } from "history";
 import * as jose from "jose";
 import Cookies from "js-cookie";
+import StylesProvider from "./StylesProvider"; // Import the StylesProvider
 
 const history = createBrowserHistory();
 
-const createJWT = async (apiKey) => {
+const createJWT = async (apiKey) =>
+{
   const secret = new TextEncoder().encode(apiKey);
   const alg = "HS256";
 
@@ -34,8 +36,10 @@ const createJWT = async (apiKey) => {
   return jwt;
 };
 
-const reducer = (state, action) => {
-  switch (action.type) {
+const reducer = (state, action) =>
+{
+  switch (action.type)
+  {
     case "SEARCH_INIT":
       return R.pipe(
         R.assoc("results", null),
@@ -72,24 +76,30 @@ const valuesOnlyContainLimit = R.pipe(
   R.isEmpty
 );
 
-function App() {
+function App()
+{
   const [state, dispatch] = useReducer(reducer, initialState);
-  const executeSearch = async (qs, apiKey) => {
+  const executeSearch = async (qs, apiKey) =>
+  {
     dispatch({ type: "SEARCH_INIT" });
-    try {
+    try
+    {
       const payload = await search(qs, apiKey);
       dispatch({ type: "SEARCH_SUCCESS", payload });
-    } catch (err) {
+    } catch (err)
+    {
       dispatch({ type: "SEARCH_ERROR", payload: err });
     }
   };
 
-  const handleReset = () => {
+  const handleReset = () =>
+  {
     dispatch({ type: "SEARCH_RESET" });
     history.push({ ...history.location, search: "" });
   };
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values) =>
+  {
     if (valuesOnlyContainLimit(values)) return;
 
     // Extract API key from values and include in a token
@@ -156,4 +166,10 @@ function App() {
   );
 }
 
-export default App;
+const WrappedApp = () => (
+  <StylesProvider>
+    <App />
+  </StylesProvider>
+);
+
+export default WrappedApp;
