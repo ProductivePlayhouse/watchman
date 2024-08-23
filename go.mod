@@ -35,6 +35,7 @@ require (
 	github.com/prometheus/common v0.45.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/rickar/cal/v2 v2.1.13 // indirect
+	golang.org/x/exp v0.0.0-20240822175202-778ce7bba035 // indirect
 	golang.org/x/sys v0.15.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
