@@ -450,7 +450,6 @@ func searchByName(searcher *searcher, nameSlug string) http.HandlerFunc {
 					highestMatchDetails = string(matchJSON)
 				} else {
 					highestMatchDetails = ""
-					logger.Error().LogErrorf("Error marshalling JSON: %v", err)
 				}
 			}
 		}
