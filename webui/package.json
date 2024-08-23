@@ -39,6 +39,7 @@
   "homepage": ".",
   "proxy": "https://watchman.pphwazuh.com",
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^5.16.7",
