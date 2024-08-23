@@ -13,7 +13,7 @@ COPY webui/ .
 RUN npm install --legacy-peer-deps
 RUN npm run build
 
-FROM ${CONTAINER_REPO}/ironbank/redhat/ubi/ubi8:latest
+FROM ${CONTAINER_REPO}/registry.access.redhat.com/ubi9:latest
 ENV AWS_REGION=us-west-2
 WORKDIR /watchman
 USER root
