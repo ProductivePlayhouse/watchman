@@ -15,6 +15,13 @@ import * as jose from "jose";
 import Cookies from "js-cookie";
 import theme from "./theme";
 import StylesProvider from "./StylesProvider";
+import { create } from 'jss';
+import { jssPreset, StylesProvider as MuiStylesProvider } from '@mui/styles';
+
+const jss = create({
+  ...jssPreset(),
+  insertionPoint: document.getElementById('jss-insertion-point'),
+});
 
 const history = createBrowserHistory();
 
@@ -91,6 +98,8 @@ const valuesOnlyContainLimit = R.pipe(
 
 function App()
 {
+  const nonce = window.cspNonce === "__CSP_NONCE__" ? null : window.cspNonce;
+
   const [state, dispatch] = useReducer(reducer, initialState);
   const executeSearch = async (qs, apiKey) =>
   {
@@ -129,36 +138,38 @@ function App()
 
   return (
     <StylesProvider>
-      <StyledEngineProvider injectFirst>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Container maxWidth="lg">
-            <MarginDiv>
-              <h1>PPH Watchman</h1>
-              <p>
-                PPH Watchman is a service which downloads, parses and indexes numerous trade, government
-                and non-profit lists of blocked individuals and entities to comply with those regions
-                laws.
-              </p>
-              <p>
-                <StyledLink href="https://github.com/SecurityPPH/watchman">
-                  GitHub
-                </StyledLink>{" "}
-                |{" "}
-                <StyledLink href="https://moov-io.github.io/watchman/">
-                  Documentation
-                </StyledLink>{" "}
-                |{" "}
-                <StyledLink href="https://moov-io.github.io/watchman/api/">
-                  API Endpoints
-                </StyledLink>
-              </p>
-            </MarginDiv>
-            <Form onSubmit={handleSubmit} onReset={handleReset} />
-            <Results data={state} />
-          </Container>
-        </ThemeProvider>
-      </StyledEngineProvider>
+      <MuiStylesProvider jss={jss} nonce={nonce}>
+        <StyledEngineProvider injectFirst>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Container maxWidth="lg">
+              <MarginDiv>
+                <h1>PPH Watchman</h1>
+                <p>
+                  PPH Watchman is a service which downloads, parses and indexes numerous trade, government
+                  and non-profit lists of blocked individuals and entities to comply with those regions
+                  laws.
+                </p>
+                <p>
+                  <StyledLink href="https://github.com/SecurityPPH/watchman">
+                    GitHub
+                  </StyledLink>{" "}
+                  |{" "}
+                  <StyledLink href="https://moov-io.github.io/watchman/">
+                    Documentation
+                  </StyledLink>{" "}
+                  |{" "}
+                  <StyledLink href="https://moov-io.github.io/watchman/api/">
+                    API Endpoints
+                  </StyledLink>
+                </p>
+              </MarginDiv>
+              <Form onSubmit={handleSubmit} onReset={handleReset} />
+              <Results data={state} />
+            </Container>
+          </ThemeProvider>
+        </StyledEngineProvider>
+      </MuiStylesProvider>
     </StylesProvider>
   );
 }
