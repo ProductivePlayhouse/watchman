@@ -12,43 +12,19 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-const Header = () => (
-  <div
-    css={`
-      margin-top: 1em;
-      width: 100%;
-    `}
-  >
-    <div
-      css={`
-        width: 100%;
-        display: grid;
-        grid-template-columns: 4em 1fr 1fr 1fr 4em 36px;
-      `}
-    >
-      <C.ResultHeader>ID</C.ResultHeader>
-      <C.ResultHeader>Name</C.ResultHeader>
-      <C.ResultHeader>Type</C.ResultHeader>
-      <C.ResultHeader>Program</C.ResultHeader>
-      <C.ResultHeader>Match</C.ResultHeader>
-      <C.ResultHeader />
-    </div>
-  </div>
-);
+// Styled Components
+const HeaderContainer = styled.div`
+  margin-top: 1em;
+  width: 100%;
+`;
 
-export const SDNS = ({ data }) =>
-{
-  if (!data) return null;
-  return (
-    <C.Section>
-      <C.SectionTitle>Specially Designated Nationals</C.SectionTitle>
-      <Header />
-      {data && data.length > 0 && data.map(s => <SDN key={s.entityID} data={s} />)}
-    </C.Section>
-  );
-};
+const GridWrapper = styled.div`
+  width: 100%;
+  display: grid;
+  grid-template-columns: 4em 1fr 1fr 1fr 4em 36px;
+`;
 
-const row = css`
+const Row = styled.div`
   width: 100%;
   display: grid;
   padding-bottom: 1em;
@@ -57,7 +33,18 @@ const row = css`
   }
 `;
 
-// remote the 'isExpanded' prop to prevent it from being passed to React/DOM
+const SDNRow = styled.div`
+  width: 100%;
+  display: grid;
+  grid-template-columns: 4em 1fr 1fr 1fr 4em;
+  padding: 0.5em 0;
+`;
+
+const CapitalizedText = styled.div`
+  text-transform: capitalize;
+`;
+
+// Styled Expansion Panel Components
 const FilterExpansionPanel = ({ isExpanded, ...props }) => <Accordion {...props} />;
 
 const ExpansionPanel = styled(FilterExpansionPanel)`
@@ -106,17 +93,16 @@ const initialState = {
   loaded: false,
   ALTS: {
     status: status.PRE_INIT,
-    data: null
+    data: null,
   },
   ADDS: {
     status: status.PRE_INIT,
-    data: null
-  }
+    data: null,
+  },
 };
 
 const reducer = (state, action) =>
 {
-  // console.log("action: ", action);
   switch (action.type)
   {
     case "EXPANDED_STATE":
@@ -129,7 +115,6 @@ const reducer = (state, action) =>
         R.assocPath([action.api, "status"], action.type),
         R.assocPath([action.api, "data"], action.payload || [])
       )(state);
-    //case status.ERROR:
     default:
       return state;
   }
@@ -145,12 +130,12 @@ export const SDN = ({ data }) =>
     if (details.loaded) return;
 
     dispatch({ api: "ALTS", type: status.INIT });
-    getSDNAlts(data.entityID).then(alts =>
+    getSDNAlts(data.entityID).then((alts) =>
       dispatch({ api: "ALTS", type: status.SUCCESS, payload: alts })
     );
 
     dispatch({ api: "ADDS", type: status.INIT });
-    getSDNAddresses(data.entityID).then(adds =>
+    getSDNAddresses(data.entityID).then((adds) =>
       dispatch({ api: "ADDS", type: status.SUCCESS, payload: adds })
     );
   };
@@ -160,61 +145,31 @@ export const SDN = ({ data }) =>
     <div>
       <ExpansionPanel onChange={handleExpandToggle} isExpanded={details.expanded}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-          <div
-            css={`
-              width: 100%;
-            `}
-          >
-            <div
-              css={`
-                width: 100%;
-                display: grid;
-                grid-template-columns: 4em 1fr 1fr 1fr 4em;
-                padding: 0.5em 0;
-              `}
-            >
+          <div>
+            <SDNRow>
               <div>{data.entityID}</div>
               <div>{data.sdnName}</div>
-              <div
-                css={`
-                  text-transform: capitalize;
-                `}
-              >
+              <CapitalizedText>
                 {data.sdnType || <C.Unknown>Unknown Type</C.Unknown>}
-              </div>
+              </CapitalizedText>
               <div>{data.ofacProgram}</div>
               <div>{matchToPercent(data.match)}</div>
-            </div>
+            </SDNRow>
 
             {data.sdnType === "individual" && data.title && (
-              <div
-                css={`
-                  ${row};
-                  padding-top: 0.5em;
-                  color: #666;
-                  grid-template-columns: 4em 1fr;
-                  & > div {
-                    margin-right: 1em;
-                  }
-                `}
-              >
+              <Row style={{ paddingTop: "0.5em", color: "#666", gridTemplateColumns: "4em 1fr" }}>
                 <div />
                 <div>{data.title}</div>
-              </div>
+              </Row>
             )}
 
             {data.sdnType === "vessel" && (
-              <div
-                css={`
-                  ${row};
-                  grid-template-columns: 4em 1fr 1fr 1fr 4em;
-                `}
-              >
+              <Row style={{ gridTemplateColumns: "4em 1fr 1fr 1fr 4em" }}>
                 <div />
                 <div>{data.vesselFlag || <C.Unknown>Unknown Flag</C.Unknown>}</div>
                 <div>{data.vesselType || <C.Unknown>Unknown Type</C.Unknown>}</div>
                 <div>{data.vesselOwner || <C.Unknown>Unknown Owner</C.Unknown>}</div>
-              </div>
+              </Row>
             )}
             <Remarks remarks={data.remarks} />
           </div>
@@ -224,5 +179,30 @@ export const SDN = ({ data }) =>
         </ExpansionPanelDetails>
       </ExpansionPanel>
     </div>
+  );
+};
+
+const Header = () => (
+  <HeaderContainer>
+    <GridWrapper>
+      <C.ResultHeader>ID</C.ResultHeader>
+      <C.ResultHeader>Name</C.ResultHeader>
+      <C.ResultHeader>Type</C.ResultHeader>
+      <C.ResultHeader>Program</C.ResultHeader>
+      <C.ResultHeader>Match</C.ResultHeader>
+      <C.ResultHeader />
+    </GridWrapper>
+  </HeaderContainer>
+);
+
+export const SDNS = ({ data }) =>
+{
+  if (!data) return null;
+  return (
+    <C.Section>
+      <C.SectionTitle>Specially Designated Nationals</C.SectionTitle>
+      <Header />
+      {data && data.length > 0 && data.map((s) => <SDN key={s.entityID} data={s} />)}
+    </C.Section>
   );
 };

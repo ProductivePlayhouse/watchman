@@ -5,23 +5,24 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 
+// Styled Component
+const FullWidthFormControl = styled(FormControl)`
+  && {
+    min-width: 100%;
+  }
+`;
+
 const render = ({ label, id, options, ...props }) => (
-  <FormControl
-    css={`
-      && {
-        min-width: 100%;
-      }
-    `}
-  >
+  <FullWidthFormControl>
     <InputLabel htmlFor={id}>{label}</InputLabel>
     <MSelect inputProps={{ name: id, id }} {...props}>
-      {options.map(o => (
+      {options.map((o) => (
         <MenuItem key={o.name} value={o.val}>
           {o.name}
         </MenuItem>
       ))}
     </MSelect>
-  </FormControl>
+  </FullWidthFormControl>
 );
 
 export default render;
