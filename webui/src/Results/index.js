@@ -1,4 +1,3 @@
-// PPH modified file
 import React from "react";
 import styled from "styled-components";
 import * as C from "../Components";
@@ -10,20 +9,21 @@ import { DeniedPersons } from "./DeniedPersons";
 import { isNilOrEmpty } from "utils";
 import { SectoralSanctions } from "./SectoralSanctions";
 
+// Styled Components
+const CenteredContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
 const render = ({ data }) =>
 {
   const { loading, error, results } = data;
   if (loading)
     return (
       <C.Container>
-        <div
-          css={`
-            display: flex;
-            justify-content: center;
-          `}
-        >
+        <CenteredContainer>
           <C.Spinner />
-        </div>
+        </CenteredContainer>
       </C.Container>
     );
   if (error) return <C.Container>ERROR: {error.message}</C.Container>;

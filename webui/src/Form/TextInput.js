@@ -2,19 +2,16 @@ import React from "react";
 import styled from "styled-components";
 import MTextField from "@mui/material/TextField";
 
-const render = ({ id, ...props }) =>
+// Styled Component
+const StyledTextField = styled(MTextField)`
+  && {
+    min-width: 100%;
+  }
+`;
+
+const Render = ({ id, ...props }) =>
 {
-  return (
-    <MTextField
-      css={`
-        && {
-          min-width: 100%;
-        }
-      `}
-      name={id}
-      {...props}
-    />
-  );
+  return <StyledTextField name={id} {...props} />;
 };
 
-export default render;
+export default Render;
