@@ -1,6 +1,7 @@
 // PPH MODIFIED
 import React, { useReducer } from "react";
 import * as R from "ramda";
+import styled from 'styled-components';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { StyledEngineProvider } from '@mui/material/styles';
@@ -13,9 +14,17 @@ import { createBrowserHistory } from "history";
 import * as jose from "jose";
 import Cookies from "js-cookie";
 import theme from "./theme";
-import StylesProvider from "./StylesProvider"; // Import your StylesProvider
+import StylesProvider from "./StylesProvider";
 
 const history = createBrowserHistory();
+
+const MarginDiv = styled.div`
+  margin: 1em auto;
+`;
+
+const StyledLink = styled.a`
+  color: #0000ee;
+`;
 
 const createJWT = async (apiKey) =>
 {
@@ -124,7 +133,7 @@ function App()
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <Container maxWidth="lg">
-            <div style={{ margin: '1em auto' }}>
+            <MarginDiv>
               <h1>PPH Watchman</h1>
               <p>
                 PPH Watchman is a service which downloads, parses and indexes numerous trade, government
@@ -132,19 +141,19 @@ function App()
                 laws.
               </p>
               <p>
-                <a href="https://github.com/SecurityPPH/watchman" style={{ color: '#0000ee' }}>
+                <StyledLink href="https://github.com/SecurityPPH/watchman">
                   GitHub
-                </a>{" "}
+                </StyledLink>{" "}
                 |{" "}
-                <a href="https://moov-io.github.io/watchman/" style={{ color: '#0000ee' }}>
+                <StyledLink href="https://moov-io.github.io/watchman/">
                   Documentation
-                </a>{" "}
+                </StyledLink>{" "}
                 |{" "}
-                <a href="https://moov-io.github.io/watchman/api/" style={{ color: '#0000ee' }}>
+                <StyledLink href="https://moov-io.github.io/watchman/api/">
                   API Endpoints
-                </a>
+                </StyledLink>
               </p>
-            </div>
+            </MarginDiv>
             <Form onSubmit={handleSubmit} onReset={handleReset} />
             <Results data={state} />
           </Container>
