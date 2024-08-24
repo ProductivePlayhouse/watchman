@@ -44,6 +44,16 @@ const CapitalizedText = styled.div`
   text-transform: capitalize;
 `;
 
+const IndividualRow = styled(Row)`
+  padding-top: 0.5em;
+  color: #666;
+  grid-template-columns: 4em 1fr;
+`;
+
+const VesselRow = styled(Row)`
+  grid-template-columns: 4em 1fr 1fr 1fr 4em;
+`;
+
 // Styled Expansion Panel Components
 const FilterExpansionPanel = ({ isExpanded, ...props }) => <Accordion {...props} />;
 
@@ -157,19 +167,19 @@ export const SDN = ({ data }) =>
             </SDNRow>
 
             {data.sdnType === "individual" && data.title && (
-              <Row style={{ paddingTop: "0.5em", color: "#666", gridTemplateColumns: "4em 1fr" }}>
+              <IndividualRow>
                 <div />
                 <div>{data.title}</div>
-              </Row>
+              </IndividualRow>
             )}
 
             {data.sdnType === "vessel" && (
-              <Row style={{ gridTemplateColumns: "4em 1fr 1fr 1fr 4em" }}>
+              <VesselRow>
                 <div />
                 <div>{data.vesselFlag || <C.Unknown>Unknown Flag</C.Unknown>}</div>
                 <div>{data.vesselType || <C.Unknown>Unknown Type</C.Unknown>}</div>
                 <div>{data.vesselOwner || <C.Unknown>Unknown Owner</C.Unknown>}</div>
-              </Row>
+              </VesselRow>
             )}
             <Remarks remarks={data.remarks} />
           </div>

@@ -9,24 +9,25 @@ import Slider from "./Slider";
 import { countryOptionData, listOptionData } from "./data";
 import { parseQueryString } from "utils";
 import { useTypeOptions, useProgramOptions } from "./options";
+import styled from 'styled-components';
 
-const ButtonSet = ({ children }) => (
-  <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '1em' }}>
-    {children}
-  </div>
-);
+const ButtonSet = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  gap: 1em;
+`;
 
-const Cell = ({ children }) => (
-  <div style={{ display: 'flex', alignItems: 'flex-end', marginBottom: '1em' }}>
-    {children}
-  </div>
-);
+const Cell = styled.div`
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 1em;
+`;
 
-const TwoColumns = ({ children }) => (
-  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1em 2em' }}>
-    {children}
-  </div>
-);
+const TwoColumns = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em 2em;
+`;
 
 const initialValues = {
   address: "",
