@@ -3,22 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "express": "4.18.1",
-    "express-winston": "3.4.0",
-    "history": "4.10.1",
-    "http-proxy-middleware": "0.21.0",
-    "jose": "^4.11.2",
-    "js-cookie": "^3.0.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "express": "^4.19.2",
+    "express-winston": "^4.2.0",
+    "history": "^5.3.0",
+    "http-proxy-middleware": "^3.0.0",
+    "jose": "^5.7.0",
+    "js-cookie": "^3.0.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-scripts": "^5.0.1",
-    "winston": "3.8.1"
+    "winston": "^3.14.2"
   },
   "scripts": {
     "build": "react-scripts build",
     "watchman-server": "docker run -p 8084:8084 -p 9094:9094 -it moov/watchman:latest",
     "server": "node server/index.js",
-    "start": "react-scripts start",
+    "start": "react-scripts --openssl-legacy-provider start",
     "test": "react-scripts test"
   },
   "eslintConfig": {
@@ -39,9 +39,13 @@
   "homepage": ".",
   "proxy": "https://watchman.pphwazuh.com",
   "devDependencies": {
-    "@material-ui/core": "4.12.4",
-    "@material-ui/icons": "4.11.3",
-    "ramda": "0.28.0",
-    "styled-components": "4.4.1"
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^5.16.7",
+    "@mui/material": "^5.16.7",
+    "@mui/styles": "^5.16.7",
+    "ramda": "0.30.1",
+    "styled-components": "^6.1.12"
   }
 }

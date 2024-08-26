@@ -14,7 +14,6 @@ import (
 	"github.com/moov-io/watchman/pkg/csl"
 )
 
-// TODO: make a search EUCLS function as well; put it in a new file
 func searchUSCSL(logger log.Logger, searcher *searcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = wrapResponseWriter(logger, w, r)
@@ -40,6 +39,9 @@ func searchUSCSL(logger log.Logger, searcher *searcher) http.HandlerFunc {
 
 func precomputeCSLEntities[T any](items []*T, pipe *pipeliner) []*Result[T] {
 	out := make([]*Result[T], len(items))
+	if items == nil {
+		return out
+	}
 
 	for i, item := range items {
 		name := cslName(item)

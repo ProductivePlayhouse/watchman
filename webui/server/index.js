@@ -4,28 +4,21 @@ const winston = require("winston");
 const expressWinston = require("express-winston");
 const proxy = require("http-proxy-middleware");
 
-const HTTP_BIND_ADDRESS =
-  typeof window !== "undefined"
-    ? window.process.env.HTTP_BIND_ADDRESS
-    : process.env.HTTP_BIND_ADDRESS || 3000;
-
+const HTTP_BIND_ADDRESS = process.env.HTTP_BIND_ADDRESS || 3000;
 const app = express();
 
 app.use(
   expressWinston.logger({
     transports: [new winston.transports.Console()],
-    format: winston.format.json(),
+    format: winston.format.json()
   })
 );
 app.use(
   "/api",
   proxy({
-    target:
-      typeof window !== "undefined"
-        ? window.process.env.WATCHMAN_ENDPOINT
-        : process.env.WATCHMAN_ENDPOINT || "http://localhost:8084",
+    target: process.env.WATCHMAN_ENDPOINT || "http://localhost:8084",
     pathRewrite: { "^/api": "" },
-    changeOrigin: true,
+    changeOrigin: true
   })
 );
 app.use("/", express.static(path.join(__dirname, "/../build")));

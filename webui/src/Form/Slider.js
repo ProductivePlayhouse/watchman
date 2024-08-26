@@ -1,24 +1,24 @@
 import React from 'react';
-import styled from "styled-components/macro"; // eslint-disable-line no-unused-vars
-import MSlider from "@material-ui/core/Slider";
-import Typography from "@material-ui/core/Typography";
+import styled from "styled-components";
+import MSlider from "@mui/material/Slider";
+import Typography from "@mui/material/Typography";
 
-const render = ({ label, ...props }) => (
-  <div
-    css={`
-      width: 100%;
-    `}
-  >
-    <Typography
-      css={`
-        && {
-        color: rgba(0, 0, 0, 0.54);
-      `}
-    >
-      {label}
-    </Typography>
+// Styled Components
+const Container = styled.div`
+  width: 100%;
+`;
+
+const StyledTypography = styled(Typography)`
+  && {
+    color: rgba(0, 0, 0, 0.54);
+  }
+`;
+
+const Render = ({ label, ...props }) => (
+  <Container>
+    <StyledTypography>{label}</StyledTypography>
     <MSlider {...props} />
-  </div>
+  </Container>
 );
 
-export default render;
+export default Render;

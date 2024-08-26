@@ -1,3 +1,4 @@
+// PPH ADDITION
 package main
 
 import (
@@ -6,7 +7,7 @@ import (
 	"os"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/moov-io/base/log"	
+	"github.com/moov-io/base/log"
 )
 
 func withAuth(logger log.Logger, next http.Handler) http.Handler {
@@ -18,9 +19,9 @@ func withAuth(logger log.Logger, next http.Handler) http.Handler {
 				logger.LogErrorf("No cookie found")
 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				return
-			}			
+			}
 			logger.LogErrorf("Error occured while reading cookie")
-			http.Error(w, "Bad Request", http.StatusBadRequest)			
+			http.Error(w, "Bad Request", http.StatusBadRequest)
 			return
 		}
 		secret := os.Getenv("API_KEY")

@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components/macro"; // eslint-disable-line no-unused-vars
+import styled from "styled-components";
 import * as C from "../Components";
 import { HighestMatch } from "./HighestMatch";
 import { SDNS } from "./SDN";
@@ -7,8 +7,13 @@ import { AltNames } from "./AltNames";
 import { Addresses } from "./Addresses";
 import { DeniedPersons } from "./DeniedPersons";
 import { isNilOrEmpty } from "utils";
-// PPH addition
 import { SectoralSanctions } from "./SectoralSanctions";
+
+// Styled Components
+const CenteredContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`;
 
 const render = ({ data }) =>
 {
@@ -16,14 +21,9 @@ const render = ({ data }) =>
   if (loading)
     return (
       <C.Container>
-        <div
-          css={`
-            display: flex;
-            justify-content: center;
-          `}
-        >
+        <CenteredContainer>
           <C.Spinner />
-        </div>
+        </CenteredContainer>
       </C.Container>
     );
   if (error) return <C.Container>ERROR: {error.message}</C.Container>;

@@ -1,19 +1,17 @@
 import React from "react";
-import styled from "styled-components/macro"; // eslint-disable-line no-unused-vars
-import MTextField from "@material-ui/core/TextField";
+import styled from "styled-components";
+import MTextField from "@mui/material/TextField";
 
-const render = ({ id, ...props }) => {
-  return (
-    <MTextField
-      css={`
-        && {
-          min-width: 100%;
-        }
-      `}
-      name={id}
-      {...props}
-    />
-  );
+// Styled Component
+const StyledTextField = styled(MTextField)`
+  && {
+    min-width: 100%;
+  }
+`;
+
+const Render = ({ id, ...props }) =>
+{
+  return <StyledTextField name={id} {...props} />;
 };
 
-export default render;
+export default Render;

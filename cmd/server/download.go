@@ -6,21 +6,18 @@ package main
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"os"
+	"strings"
 	"time"
 
-	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/log"
 	"github.com/moov-io/watchman/pkg/csl"
 	"github.com/moov-io/watchman/pkg/dpl"
 	"github.com/moov-io/watchman/pkg/ofac"
 
-	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -72,10 +69,13 @@ type DownloadStats struct {
 	NonSDNMenuBasedSanctions         int `json:"nonSDNMenuBasedSanctions"`
 
 	// EU Consolidated Sanctions List
-	EUCSL int `json:"EuropeanSanctionsList"`
+	EUCSL int `json:"europeanSanctionsList"`
 
-	// EU Consolidated Sanctions List
-	UKCSL int `json:"UKSanctionsList"`
+	// UK Consolidated Sanctions List
+	UKCSL int `json:"ukConsolidatedSanctionsList"`
+
+	// UK Sanctions List
+	UKSanctionsList int `json:"ukSanctionsList"`
 
 	Errors      []error   `json:"-"`
 	RefreshedAt time.Time `json:"timestamp"`
@@ -94,7 +94,7 @@ func (ss *DownloadStats) MarshalJSON() ([]byte, error) {
 		DownloadStats
 		Errors []string `json:"errors"`
 	}
-	var errors []string
+	errors := make([]string, 0, len(ss.Errors))
 	for i := range ss.Errors {
 		errors = append(errors, ss.Errors[i].Error())
 	}
@@ -106,7 +106,7 @@ func (ss *DownloadStats) MarshalJSON() ([]byte, error) {
 
 // periodicDataRefresh will forever block for interval's duration and then download and reparse the data.
 // Download stats are recorded as part of a successful re-download and parse.
-func (s *searcher) periodicDataRefresh(interval time.Duration, downloadRepo downloadRepository, updates chan *DownloadStats) {
+func (s *searcher) periodicDataRefresh(interval time.Duration, updates chan *DownloadStats) {
 	if interval == 0*time.Second {
 		s.logger.Logf("not scheduling periodic refreshing duration=%v", interval)
 		return
@@ -119,7 +119,6 @@ func (s *searcher) periodicDataRefresh(interval time.Duration, downloadRepo down
 				s.logger.Info().Logf("ERROR: refreshing data: %v", err)
 			}
 		} else {
-			downloadRepo.recordStats(stats)
 			if s.logger != nil {
 				s.logger.Info().With(log.Fields{
 					// OFAC
@@ -146,7 +145,7 @@ func (s *searcher) periodicDataRefresh(interval time.Duration, downloadRepo down
 					"UK_CSL":           log.Int(stats.UKCSL),
 				}).Logf("data refreshed %v ago", time.Since(stats.RefreshedAt))
 			}
-			updates <- stats // send stats for re-search and watch notifications
+			updates <- stats // send stats back
 		}
 	}
 }
@@ -159,32 +158,25 @@ func ofacRecords(logger log.Logger, initialDir string) (*ofac.Results, error) {
 	if len(files) == 0 {
 		return nil, errors.New("no OFAC Results")
 	}
+	res, err := ofac.Read(files)
+	if err != nil {
+		return nil, err
+	}
 
-	var res *ofac.Results
+	// Merge comments into SDNs
+	res.SDNs = mergeSpilloverRecords(res.SDNs, res.SDNComments)
+	return res, nil
+}
 
-	for i := range files {
-		if i == 0 {
-			rr, err := ofac.Read(files[i])
-			if err != nil {
-				return nil, fmt.Errorf("read: %v", err)
-			}
-			if rr != nil {
-				res = rr
-			}
-		} else {
-			rr, err := ofac.Read(files[i])
-			if err != nil {
-				return nil, fmt.Errorf("read and replace: %v", err)
-			}
-			if rr != nil {
-				res.Addresses = append(res.Addresses, rr.Addresses...)
-				res.AlternateIdentities = append(res.AlternateIdentities, rr.AlternateIdentities...)
-				res.SDNs = append(res.SDNs, rr.SDNs...)
-				res.SDNComments = append(res.SDNComments, rr.SDNComments...)
+func mergeSpilloverRecords(sdns []*ofac.SDN, comments []*ofac.SDNComments) []*ofac.SDN {
+	for i := range sdns {
+		for j := range comments {
+			if sdns[i].EntityID == comments[j].EntityID {
+				sdns[i].Remarks += comments[j].RemarksExtended
 			}
 		}
 	}
-	return res, err
+	return sdns
 }
 
 func dplRecords(logger log.Logger, initialDir string) ([]*dpl.DPL, error) {
@@ -192,48 +184,66 @@ func dplRecords(logger log.Logger, initialDir string) ([]*dpl.DPL, error) {
 	if err != nil {
 		return nil, err
 	}
-	return dpl.Read(file)
+
+	return dpl.Read(file["dpl.txt"])
 }
 
 func cslRecords(logger log.Logger, initialDir string) (*csl.CSL, error) {
 	file, err := csl.Download(logger, initialDir)
 	if err != nil {
-		logger.Warn().LogErrorf("skipping CSL download: %v", err)
+		logger.Warn().Logf("skipping CSL download: %v", err)
 		return &csl.CSL{}, nil
 	}
-	cslRecords, err := csl.ReadFile(file)
+	cslRecords, err := csl.ReadFile(file["csl.csv"])
 	if err != nil {
 		return nil, err
 	}
-	return cslRecords, err
+	return cslRecords, nil
 }
 
 func euCSLRecords(logger log.Logger, initialDir string) ([]*csl.EUCSLRecord, error) {
 	file, err := csl.DownloadEU(logger, initialDir)
 	if err != nil {
-		logger.Warn().LogErrorf("skipping EU CSL download: %v", err)
+		logger.Warn().Logf("skipping EU CSL download: %v", err)
 		// no error to return because we skip the download
 		return nil, nil
 	}
-	cslRecords, _, err := csl.ReadEUFile(file)
+
+	cslRecords, _, err := csl.ParseEU(file["eu_csl.csv"])
+	if err != nil {
+		return nil, err
+	}
+	return cslRecords, err
+
+}
+
+func ukCSLRecords(logger log.Logger, initialDir string) ([]*csl.UKCSLRecord, error) {
+	file, err := csl.DownloadUKCSL(logger, initialDir)
+	if err != nil {
+		logger.Warn().Logf("skipping UK CSL download: %v", err)
+		// no error to return because we skip the download
+		return nil, nil
+	}
+	cslRecords, _, err := csl.ReadUKCSLFile(file["ConList.csv"])
 	if err != nil {
 		return nil, err
 	}
 	return cslRecords, err
 }
 
-func ukCSLRecords(logger log.Logger, initialDir string) ([]*csl.UKCSLRecord, error) {
-	file, err := csl.DownloadUK(logger, initialDir)
+func ukSanctionsListRecords(logger log.Logger, initialDir string) ([]*csl.UKSanctionsListRecord, error) {
+	file, err := csl.DownloadUKSanctionsList(logger, initialDir)
 	if err != nil {
-		logger.Warn().LogErrorf("skipping UK CSL download: %v", err)
+		logger.Warn().Logf("skipping UK Sanctions List download: %v", err)
 		// no error to return because we skip the download
 		return nil, nil
 	}
-	cslRecords, _, err := csl.ReadUKFile(file)
+
+	records, _, err := csl.ReadUKSanctionsListFile(file["UK_Sanctions_List.ods"])
 	if err != nil {
 		return nil, err
 	}
-	return cslRecords, err
+	return records, err
 }
 
 // refreshData reaches out to the various websites to download the latest
@@ -258,10 +268,14 @@ func (s *searcher) refreshData(initialDir string) (*DownloadStats, error) {
 		lastDataRefreshFailure.WithLabelValues("SDNs").Set(float64(time.Now().Unix()))
 		stats.Errors = append(stats.Errors, fmt.Errorf("OFAC: %v", err))
 	}
+	if results == nil {
+		results = &ofac.Results{}
+	}
 
 	sdns := precomputeSDNs(results.SDNs, results.Addresses, s.pipe)
 	adds := precomputeAddresses(results.Addresses)
 	alts := precomputeAlts(results.AlternateIdentities, s.pipe)
+	sdnComments := results.SDNComments
 
 	deniedPersons, err := dplRecords(s.logger, initialDir)
 	if err != nil {
@@ -286,11 +300,28 @@ func (s *searcher) refreshData(initialDir string) (*DownloadStats, error) {
 
 	ukCSLs := precomputeCSLEntities[csl.UKCSLRecord](ukConsolidatedList, s.pipe)
 
+	var ukSLs []*Result[csl.UKSanctionsListRecord]
+	withSanctionsList := os.Getenv("WITH_UK_SANCTIONS_LIST")
+	if strings.ToLower(withSanctionsList) == "true" {
+		ukSanctionsList, err := ukSanctionsListRecords(s.logger, initialDir)
+		if err != nil {
+			lastDataRefreshFailure.WithLabelValues("UKSanctionsList").Set(float64(time.Now().Unix()))
+			stats.Errors = append(stats.Errors, fmt.Errorf("UKSanctionsList: %v", err))
+		}
+		ukSLs = precomputeCSLEntities[csl.UKSanctionsListRecord](ukSanctionsList, s.pipe)
+
+		stats.UKSanctionsList = len(ukSLs)
+		lastDataRefreshCount.WithLabelValues("UKSL").Set(float64(len(ukSLs)))
+	}
+
 	// csl records from US downloaded here
 	consolidatedLists, err := cslRecords(s.logger, initialDir)
 	if err != nil {
 		lastDataRefreshFailure.WithLabelValues("CSL").Set(float64(time.Now().Unix()))
 		stats.Errors = append(stats.Errors, fmt.Errorf("CSL: %v", err))
+	}
+	if consolidatedLists == nil {
+		consolidatedLists = new(csl.CSL)
 	}
 	els := precomputeCSLEntities[csl.EL](consolidatedLists.ELs, s.pipe)
 	meus := precomputeCSLEntities[csl.MEU](consolidatedLists.MEUs, s.pipe)
@@ -357,6 +388,7 @@ func (s *searcher) refreshData(initialDir string) (*DownloadStats, error) {
 	s.SDNs = sdns
 	s.Addresses = adds
 	s.Alts = alts
+	s.SDNComments = sdnComments
 	// BIS
 	s.DPs = dps
 	// CSL
@@ -375,6 +407,7 @@ func (s *searcher) refreshData(initialDir string) (*DownloadStats, error) {
 	s.EUCSL = euCSLs
 	//UKCSL
 	s.UKCSL = ukCSLs
+	s.UKSanctionsList = ukSLs
 	// metadata
 	s.lastRefreshedAt = stats.RefreshedAt
 	s.Unlock()
@@ -411,86 +444,4 @@ func lastRefresh(dir string) time.Time {
 		}
 	}
 	return oldest.In(time.UTC)
-}
-
-func addDownloadRoutes(logger log.Logger, r *mux.Router, repo downloadRepository) {
-	r.Methods("GET").Path("/downloads").HandlerFunc(getLatestDownloads(logger, repo))
-}
-
-func getLatestDownloads(logger log.Logger, repo downloadRepository) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
-
-		limit := extractSearchLimit(r)
-		downloads, err := repo.latestDownloads(limit)
-		if err != nil {
-			moovhttp.Problem(w, err)
-			return
-		}
-
-		logger.Info().With(log.Fields{
-			"requestID": log.String(moovhttp.GetRequestID(r)),
-		}).Log("get latest downloads")
-
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(http.StatusOK)
-		if err := json.NewEncoder(w).Encode(downloads); err != nil {
-			moovhttp.Problem(w, err)
-			return
-		}
-	}
-}
-
-type downloadRepository interface {
-	latestDownloads(limit int) ([]DownloadStats, error)
-	recordStats(stats *DownloadStats) error
-}
-
-type sqliteDownloadRepository struct {
-	db     *sql.DB
-	logger log.Logger
-}
-
-func (r *sqliteDownloadRepository) close() error {
-	return r.db.Close()
-}
-
-func (r *sqliteDownloadRepository) recordStats(stats *DownloadStats) error {
-	if stats == nil {
-		return errors.New("recordStats: nil downloadStats")
-	}
-
-	query := `insert into download_stats (downloaded_at, sdns, alt_names, addresses, sectoral_sanctions, denied_persons, bis_entities) values (?, ?, ?, ?, ?, ?, ?);`
-	stmt, err := r.db.Prepare(query)
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(stats.RefreshedAt, stats.SDNs, stats.Alts, stats.Addresses, stats.SectoralSanctions, stats.DeniedPersons, stats.BISEntities)
-	return err
-}
-
-func (r *sqliteDownloadRepository) latestDownloads(limit int) ([]DownloadStats, error) {
-	query := `select downloaded_at, sdns, alt_names, addresses, sectoral_sanctions, denied_persons, bis_entities from download_stats order by downloaded_at desc limit ?;`
-	stmt, err := r.db.Prepare(query)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(limit)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var downloads []DownloadStats
-	for rows.Next() {
-		var dl DownloadStats
-		if err := rows.Scan(&dl.RefreshedAt, &dl.SDNs, &dl.Alts, &dl.Addresses, &dl.SectoralSanctions, &dl.DeniedPersons, &dl.BISEntities); err == nil {
-			downloads = append(downloads, dl)
-		}
-	}
-	return downloads, rows.Err()
 }

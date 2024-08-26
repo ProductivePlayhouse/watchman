@@ -21,6 +21,7 @@ services:
 
   watchman:
     image: ${CONTAINER_REPO}/watchman-prd:latest
+    restart: always    
     environment:
       - DATABASE_TYPE=mysql
       - MYSQL_ADDRESS=tcp(mysql:3306)
