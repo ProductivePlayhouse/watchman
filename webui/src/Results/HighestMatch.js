@@ -1,8 +1,9 @@
 import React from "react";
-import styled from "styled-components/macro"; // eslint-disable-line no-unused-vars
+import styled from "styled-components";
 import * as C from "Components";
 
-export const HighestMatch = ({ data }) => {
+export const HighestMatch = ({ data }) =>
+{
   if (!data) return null;
   return (
     <C.Section>

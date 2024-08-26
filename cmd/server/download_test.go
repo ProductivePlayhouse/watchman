@@ -8,17 +8,15 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"net/http"
-	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 	"time"
 
 	"github.com/moov-io/base/log"
-	"github.com/moov-io/watchman/internal/database"
+	"github.com/moov-io/watchman/pkg/ofac"
 
-	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"
 )
 
@@ -59,7 +57,7 @@ func TestSearcher__refreshInterval(t *testing.T) {
 
 	// cover another branch
 	s := newSearcher(log.NewNopLogger(), noLogPipeliner, 1)
-	s.periodicDataRefresh(0*time.Second, nil, nil)
+	s.periodicDataRefresh(0*time.Second, nil)
 }
 
 func TestSearcher__refreshData(t *testing.T) {
@@ -84,95 +82,6 @@ func TestSearcher__refreshData(t *testing.T) {
 	if len(s.BISEntities) == 0 || stats.BISEntities == 0 {
 		t.Errorf("empty searcher.BISEntities=%d or stats.BISEntities=%d", len(s.BISEntities), stats.BISEntities)
 	}
-}
-
-func TestDownload_record(t *testing.T) {
-	t.Parallel()
-
-	check := func(t *testing.T, repo *sqliteDownloadRepository) {
-		stats := &DownloadStats{
-			SDNs: 1, Alts: 12, Addresses: 42,
-			DeniedPersons: 13,
-			BISEntities:   32, SectoralSanctions: 39,
-		}
-		if err := repo.recordStats(stats); err != nil {
-			t.Fatal(err)
-		}
-
-		downloads, err := repo.latestDownloads(5)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if len(downloads) != 1 {
-			t.Errorf("got %d downloads", len(downloads))
-		}
-		dl := downloads[0]
-		if dl.SDNs != stats.SDNs {
-			t.Errorf("dl.SDNs=%d stats.SDNs=%d", dl.SDNs, stats.SDNs)
-		}
-		if dl.Alts != stats.Alts {
-			t.Errorf("dl.Alts=%d stats.Alts=%d", dl.Alts, stats.Alts)
-		}
-		if dl.Addresses != stats.Addresses {
-			t.Errorf("dl.Addresses=%d stats.Addresses=%d", dl.Addresses, stats.Addresses)
-		}
-		if dl.DeniedPersons != stats.DeniedPersons {
-			t.Errorf("dl.DeniedPersons=%d stats.DeniedPersons=%d", dl.DeniedPersons, stats.DeniedPersons)
-		}
-		if dl.SectoralSanctions != stats.SectoralSanctions {
-			t.Errorf("dl.SectoralSanctions=%d stats.SectoralSanctions=%d", dl.SectoralSanctions, stats.SectoralSanctions)
-		}
-		if dl.BISEntities != stats.BISEntities {
-			t.Errorf("dl.BISEntities=%d stats.BISEntities=%d", dl.BISEntities, stats.BISEntities)
-		}
-	}
-
-	// SQLite tests
-	sqliteDB := database.CreateTestSqliteDB(t)
-	defer sqliteDB.Close()
-	check(t, &sqliteDownloadRepository{sqliteDB.DB, log.NewNopLogger()})
-
-	// MySQL tests
-	mysqlDB := database.TestMySQLConnection(t)
-	check(t, &sqliteDownloadRepository{mysqlDB, log.NewNopLogger()})
-}
-
-func TestDownload_route(t *testing.T) {
-	t.Parallel()
-
-	check := func(t *testing.T, repo *sqliteDownloadRepository) {
-		w := httptest.NewRecorder()
-		req := httptest.NewRequest("GET", "/downloads", nil)
-		req.Header.Set("x-user-id", "test")
-
-		repo.recordStats(&DownloadStats{SDNs: 1, Alts: 421, Addresses: 1511, DeniedPersons: 731, SectoralSanctions: 289, BISEntities: 189})
-
-		router := mux.NewRouter()
-		addDownloadRoutes(log.NewNopLogger(), router, repo)
-		router.ServeHTTP(w, req)
-		w.Flush()
-
-		if w.Code != http.StatusOK {
-			t.Errorf("bogus status code: %d", w.Code)
-		}
-
-		var downloads []DownloadStats
-		if err := json.NewDecoder(w.Body).Decode(&downloads); err != nil {
-			t.Error(err)
-		}
-		if len(downloads) != 1 {
-			t.Errorf("got %d downloads: %v", len(downloads), downloads)
-		}
-	}
-
-	// SQLite tests
-	sqliteDB := database.CreateTestSqliteDB(t)
-	defer sqliteDB.Close()
-	check(t, &sqliteDownloadRepository{sqliteDB.DB, log.NewNopLogger()})
-
-	// MySQL tests
-	mysqlDB := database.TestMySQLConnection(t)
-	check(t, &sqliteDownloadRepository{mysqlDB, log.NewNopLogger()})
 }
 
 func TestDownload__lastRefresh(t *testing.T) {
@@ -205,4 +114,25 @@ func TestDownload__lastRefresh(t *testing.T) {
 			t.Errorf("t=%v", when)
 		}
 	}
+}
+
+func TestDownload__OFAC_Spillover(t *testing.T) {
+	logger := log.NewTestLogger()
+	initialDir := filepath.Join("..", "..", "test", "testdata", "static")
+
+	res, err := ofacRecords(logger, initialDir)
+	require.NoError(t, err)
+
+	var sdn *ofac.SDN
+	idx := slices.IndexFunc(res.SDNs, func(s *ofac.SDN) bool {
+		return s.EntityID == "12300"
+	})
+	if idx >= 0 {
+		sdn = res.SDNs[idx]
+	}
+	require.NotNil(t, sdn)
+
+	//nolint:misspell
+	expected := `DOB 13 May 1965; alt. DOB 13 Apr 1968; alt. DOB 07 Jul 1964; POB Medellin, Colombia; alt. POB Marinilla, Antioquia, Colombia; alt. POB Ciudad Victoria, Tamaulipas, Mexico; Cedula No. 7548733 (Colombia); alt. Cedula No. 70163752 (Colombia); alt. Cedula No. 172489729-1 (Ecuador); Passport AL720622 (Colombia); R.F.C. CIVJ650513LJA (Mexico); alt. R.F.C. OUSV-640707 (Mexico); C.U.R.P. CIVJ650513HNEFLR06 (Mexico); alt. C.U.R.P. OUVS640707HTSSLR07 (Mexico); Matricula Mercantil No 181301-1 Cali (Colombia); alt. Matricula Mercantil No 405885 Bogota (Colombia); Linked To: BIO FORESTAL S.A.S.; Linked To: CUBI CAFE CLICK CUBE MEXICO, S.A. DE C.V.; Linked To: DOLPHIN DIVE SCHOOL S.A.; Linked To: GANADERIA LA SORGUITA S.A.S.; Linked To: GESTORES DEL ECUADOR GESTORUM S.A.; Linked To: INVERPUNTO DEL VALLE S.A.; Linked To: INVERSIONES CIFUENTES Y CIA. S. EN C.; Linked To: LE CLAUDE, S.A. DE C.V.; Linked To: OPERADORA NUEVA GRANADA, S.A. DE C.V.; Linked To: PARQUES TEMATICOS S.A.S.; Linked To: PROMO RAIZ S.A.S.; Linked To: RED MUNDIAL INMOBILIARIA, S.A. DE C.V.; Linked To: FUNDACION PARA EL BIENESTAR Y EL PORVENIR; Linked To: C.I. METALURGIA EXTRACTIVA DE COLOMBIA S.A.S.; Linked To: GRUPO MUNDO MARINO, S.A.; Linked To: C.I. DISERCOM S.A.S.; Linked To: C.I. OKCOFFEE COLOMBIA S.A.S.; Linked To: C.I. OKCOFFEE INTERNATIONAL S.A.S.; Linked To: FUNDACION OKCOFFEE COLOMBIA; Linked To: CUBICAFE S.A.S.; Linked To: HOTELES Y BIENES S.A.; Linked To: FUNDACION SALVA LA SELVA; Linked To: LINEA AEREA PUEBLOS AMAZONICOS S.A.S.; Linked To: DESARROLLO MINERO RESPONSABLE C.I. S.A.S.; Linked To: R D I S.A.`
+	require.Equal(t, expected, sdn.Remarks)
 }

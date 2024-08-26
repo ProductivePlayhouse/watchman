@@ -5,7 +5,6 @@
 package main
 
 import (
-
 	"context"
 	"crypto/tls"
 	"flag"
@@ -21,11 +20,11 @@ import (
 	"time"
 
 	"github.com/moov-io/base/admin"
+
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/http/bind"
 	"github.com/moov-io/base/log"
 	"github.com/moov-io/watchman"
-	"github.com/moov-io/watchman/internal/database"
 
 	"github.com/gorilla/mux"
 )
@@ -66,18 +65,6 @@ func main() {
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 		errs <- fmt.Errorf("signal: %v", <-c)
-	}()
-
-	// Setup database connection
-	db, err := database.New(logger, os.Getenv("DATABASE_TYPE"))
-	if err != nil {
-		logger.Logf("database problem: %v", err)
-		os.Exit(1)
-	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			logger.LogError(err)
-		}
 	}()
 
 	// Setup business HTTP routes
@@ -123,7 +110,12 @@ func main() {
 	}
 
 	// Start Admin server (with Prometheus metrics)
-	adminServer := admin.NewServer(*adminAddr)
+	adminServer, err := admin.New(admin.Opts{
+		Addr: *adminAddr,
+	})
+	if err != nil {
+		errs <- fmt.Errorf("problem starting admin server: %v", err)
+	}
 	adminServer.AddVersionHandler(watchman.Version) // Setup 'GET /version'
 	go func() {
 		logger.Logf("listening on %s", adminServer.BindAddr())
@@ -135,17 +127,15 @@ func main() {
 	}()
 	defer adminServer.Shutdown()
 
-	// Setup download repository
-	downloadRepo := &sqliteDownloadRepository{db, logger}
-	defer downloadRepo.close()
-
 	var pipeline *pipeliner
 	if debug, err := strconv.ParseBool(os.Getenv("DEBUG_NAME_PIPELINE")); debug && err == nil {
 		pipeline = newPipeliner(logger)
 	} else {
 		pipeline = newPipeliner(log.NewNopLogger())
 	}
-	searcher := newSearcher(logger, pipeline, *flagWorkers)
+
+	searchWorkers := readInt(os.Getenv("SEARCH_MAX_WORKERS"), *flagWorkers)
+	searcher := newSearcher(logger, pipeline, searchWorkers)
 
 	// PPH DISABLED
 	// Add debug routes
@@ -156,63 +146,44 @@ func main() {
 		logger.LogErrorf("ERROR: failed to download/parse initial data: %v", err)
 		os.Exit(1)
 	} else {
-		if err := downloadRepo.recordStats(stats); err != nil {
-			logger.LogErrorf("ERROR: failed to record download stats: %v", err)
-			os.Exit(1)
-		}
 		logger.Info().With(log.Fields{
-			"SDNs":        log.Int(stats.SDNs),
-			"AltNames":    log.Int(stats.Alts),
-			"Addresses":   log.Int(stats.Addresses),
-			"SSI":         log.Int(stats.SectoralSanctions),
-			"DPL":         log.Int(stats.DeniedPersons),
-			"BISEntities": log.Int(stats.BISEntities),
-			"UVL":         log.Int(stats.Unverified),
-			"ISN":         log.Int(stats.NonProliferationSanctions),
-			"FSE":         log.Int(stats.ForeignSanctionsEvaders),
-			"PLC":         log.Int(stats.PalestinianLegislativeCouncil),
-			"CAP":         log.Int(stats.CAPTA),
-			"DTC":         log.Int(stats.ITARDebarred),
-			"CMIC":        log.Int(stats.ChineseMilitaryIndustrialComplex),
-			"NS_MBS":      log.Int(stats.NonSDNMenuBasedSanctions),
-			"EU_CSL":      log.Int(stats.EUCSL),
-			"UK_CSL":      log.Int(stats.UKCSL),
+			"SDNs":             log.Int(stats.SDNs),
+			"AltNames":         log.Int(stats.Alts),
+			"Addresses":        log.Int(stats.Addresses),
+			"SSI":              log.Int(stats.SectoralSanctions),
+			"DPL":              log.Int(stats.DeniedPersons),
+			"BISEntities":      log.Int(stats.BISEntities),
+			"UVL":              log.Int(stats.Unverified),
+			"ISN":              log.Int(stats.NonProliferationSanctions),
+			"FSE":              log.Int(stats.ForeignSanctionsEvaders),
+			"PLC":              log.Int(stats.PalestinianLegislativeCouncil),
+			"CAP":              log.Int(stats.CAPTA),
+			"DTC":              log.Int(stats.ITARDebarred),
+			"CMIC":             log.Int(stats.ChineseMilitaryIndustrialComplex),
+			"NS_MBS":           log.Int(stats.NonSDNMenuBasedSanctions),
+			"EU_CSL":           log.Int(stats.EUCSL),
+			"UK_CSL":           log.Int(stats.UKCSL),
+			"UK_SanctionsList": log.Int(stats.UKSanctionsList),
 		}).Logf("data refreshed %v ago", time.Since(stats.RefreshedAt))
 	}
-
-	// Setup Watch and Webhook database wrapper
-	watchRepo := &sqliteWatchRepository{db, logger}
-	defer watchRepo.close()
-	webhookRepo := &sqliteWebhookRepository{db}
-	defer webhookRepo.close()
-
-	// Setup company / customer repositories
-	companyRepo := &sqliteCompanyRepository{db, logger}
-	defer companyRepo.close()
-	custRepo := &sqliteCustomerRepository{db, logger}
-	defer custRepo.close()
 
 	// Setup periodic download and re-search
 	updates := make(chan *DownloadStats)
 	dataRefreshInterval = getDataRefreshInterval(logger, os.Getenv("DATA_REFRESH_INTERVAL"))
-	go searcher.periodicDataRefresh(dataRefreshInterval, downloadRepo, updates)
+	go searcher.periodicDataRefresh(dataRefreshInterval, updates)
 	go handleDownloadStats(updates, func(stats *DownloadStats) {
 		callDownloadWebook(logger, stats)
-		searcher.spawnResearching(logger, companyRepo, custRepo, watchRepo, webhookRepo)
 	})
 
 	// PPH DISABLED
 	// Add manual data refresh endpoint
-	// adminServer.AddHandler(manualRefreshPath, manualRefreshHandler(logger, searcher, updates, downloadRepo))
+	// adminServer.AddHandler(manualRefreshPath, manualRefreshHandler(logger, searcher, updates))
 
 	// Add searcher for HTTP routes
 	addSearchRoutes(logger, router, searcher)
 
 	// PPH DISABLED
-	// addCompanyRoutes(logger, router, searcher, companyRepo, watchRepo)
-	// addCustomerRoutes(logger, router, searcher, custRepo, watchRepo)
-	// addSDNRoutes(logger, router, searcher)	
-	// addDownloadRoutes(logger, router, downloadRepo)
+	// addSDNRoutes(logger, router, searcher)
 	// addValuesRoutes(logger, router, searcher)
 
 	// Setup our web UI to be served as well
@@ -238,9 +209,7 @@ func main() {
 		shutdownServer()
 		logger.LogErrorf("final exit: %v", err)
 	}
-	
 }
-
 
 func addPingRoute(r *mux.Router) {
 	r.Methods("GET").Path("/ping").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
