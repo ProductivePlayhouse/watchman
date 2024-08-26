@@ -1,60 +1,59 @@
 import React from "react";
 import * as R from "ramda";
-import styled, { css } from "styled-components/macro"; // eslint-disable-line no-unused-vars
-import CircularProgress from "@material-ui/core/CircularProgress";
+import styled from "styled-components";
+import CircularProgress from "@mui/material/CircularProgress";
 import * as C from "Components";
 import { Header as AddressHeader, Address } from "./Addresses";
 import { Header as AlternatesHeader, AltName } from "./AltNames";
 
-const Addresses = ({ data }) => {
+// Styled Components
+const SectionContainer = styled.div`
+  margin-bottom: 1em;
+`;
+
+const SDNExpandDetailsContainer = styled.div`
+  width: 100%;
+  & > * {
+    margin-bottom: 1.5em;
+  }
+  & > *:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const Addresses = ({ data }) =>
+{
   if (!data) return <CircularProgress size="1em" />;
   if (data.length === 0) return null;
   return (
-    <div
-      css={`
-        margin-bottom: 1em;
-      `}
-    >
+    <SectionContainer>
       <C.SectionTitle>Addresses</C.SectionTitle>
       <AddressHeader withMatch={false} />
-      {data.map(a => (
+      {data.map((a) => (
         <Address key={a.addressID} data={a} displayId="addressID" />
       ))}
-    </div>
+    </SectionContainer>
   );
 };
 
-const Alternates = ({ data }) => {
+const Alternates = ({ data }) =>
+{
   if (!data) return <CircularProgress size="1em" />;
   if (data.length === 0) return null;
   return (
-    <div
-      css={`
-        margin-bottom: 1em;
-      `}
-    >
+    <SectionContainer>
       <C.SectionTitle>Alternate Names</C.SectionTitle>
       <AlternatesHeader withMatch={false} />
-      {data.map(a => (
+      {data.map((a) => (
         <AltName key={a.alternateID} data={a} displayId="alternateID" />
       ))}
-    </div>
+    </SectionContainer>
   );
 };
 
 export const SDNExpandDetails = ({ data }) => (
-  <div
-    css={`
-      width: 100%;
-      & > * {
-        margin-bottom: 1.5em;
-      }
-      & > *:last-child {
-        margin-bottom: 0;
-      }
-    `}
-  >
+  <SDNExpandDetailsContainer>
     <Addresses data={R.path(["ADDS", "data"])(data)} />
     <Alternates data={R.path(["ALTS", "data"])(data)} />
-  </div>
+  </SDNExpandDetailsContainer>
 );

@@ -21,11 +21,6 @@ import (
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/gorilla/mux"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
-
-	// "github.com/moov-io/watchman"
-	// "github.com/moov-io/watchman/internal/database"	
-	// "github.com/aws/aws-sdk-go-v2/config"	
-	// "github.com/aws/aws-sdk-go-v2/service/dynamodb"	
 )
 
 var (
@@ -95,58 +90,38 @@ func readAddressSearchRequest(u *url.URL) addressSearchRequest {
 func search(logger log.Logger, searcher *searcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = wrapResponseWriter(logger, w, r)
-		requestID := moovhttp.GetRequestID(r)
 
 		// Search over all fields
 		if q := strings.TrimSpace(r.URL.Query().Get("q")); q != "" {
-			logger.Info().With(log.Fields{
-				"requestID": log.String(requestID),
-			}).Logf("searching all names and address for %s", q)
-			searchViaQ(logger, searcher, q)(w, r)
+			searchViaQ(searcher, q)(w, r)
 			return
 		}
 
 		// Search by ID (found in an SDN's Remarks property)
 		if id := strings.TrimSpace(r.URL.Query().Get("id")); id != "" {
-			logger.Info().With(log.Fields{
-				"requestID": log.String(requestID),
-			}).Logf("searching SDNs by remarks ID for %s", id)
-			searchByRemarksID(logger, searcher, id)(w, r)
+			searchByRemarksID(searcher, id)(w, r)
 			return
 		}
 
 		// Search by Name
 		if name := strings.TrimSpace(r.URL.Query().Get("name")); name != "" {
 			if req := readAddressSearchRequest(r.URL); !req.empty() {
-				logger.Info().With(log.Fields{
-					"requestID": log.String(requestID),
-				}).Logf("searching SDN names='%s' and addresses", name)
-				searchViaAddressAndName(logger, searcher, name, req)(w, r)
-				return
+				searchViaAddressAndName(searcher, name, req)(w, r)
+			} else {
+				searchByName(searcher, name)(w, r)
 			}
-
-			logger.Info().With(log.Fields{
-				"requestID": log.String(requestID),
-			}).Logf("searching SDN names for %s", name)
-			searchByName(logger, searcher, name)(w, r)
 			return
 		}
 
 		// Search by Alt Name
 		if alt := strings.TrimSpace(r.URL.Query().Get("altName")); alt != "" {
-			logger.Info().With(log.Fields{
-				"requestID": log.String(requestID),
-			}).Logf("searching SDN alt names for %s", alt)
-			searchByAltName(logger, searcher, alt)(w, r)
+			searchByAltName(searcher, alt)(w, r)
 			return
 		}
 
 		// Search Addresses
 		if req := readAddressSearchRequest(r.URL); !req.empty() {
-			logger.Info().With(log.Fields{
-				"requestID": log.String(requestID),
-			}).Logf("searching address for %#v", req)
-			searchByAddress(logger, searcher, req)(w, r)
+			searchByAddress(searcher, req)(w, r)
 			return
 		}
 
@@ -160,36 +135,40 @@ type searchResponse struct {
 	Query   string       `json:"query" dynamodbav:"query"`
 	Datetime int64       `json:"datetime" dynamodbav:"datetime"` // unix timestamp
 	HighestMatch float64 `json:"highestMatch" dynamodbav:"highestMatch"`
+	HighestMatchDetails string `json:"highestMatchDetails" dynamodbav:"highestMatchDetails"`
 
 	// OFAC
-	SDNs      []*SDN    `json:"SDNs" dynamodbav:"SDNs"`
-	AltNames  []Alt     `json:"altNames" dynamodbav:"altNames"`
-	Addresses []Address `json:"addresses" dynamodbav:"addresses"`
+	SDNs      []*SDN    `json:"SDNs"`
+	AltNames  []Alt     `json:"altNames"`
+	Addresses []Address `json:"addresses"`
 
 	// BIS
-	DeniedPersons []DP `json:"deniedPersons" dynamodbav:"deniedPersons"`
+	DeniedPersons []DP `json:"deniedPersons"`
 
 	// Consolidated Screening List
-	BISEntities                            []*Result[csl.EL]     `json:"bisEntities" dynamodbav:"bisEntities"`
-	MilitaryEndUsers                       []*Result[csl.MEU]    `json:"militaryEndUsers" dynamodbav:"militaryEndUsers"`
-	SectoralSanctions                      []*Result[csl.SSI]    `json:"sectoralSanctions" dynamodbav:"sectoralSanctions"`
-	Unverified                             []*Result[csl.UVL]    `json:"unverifiedCSL" dynamodbav:"unverifiedCSL"`
-	NonproliferationSanctions              []*Result[csl.ISN]    `json:"nonproliferationSanctions" dynamodbav:"nonproliferationSanctions"`
-	ForeignSanctionsEvaders                []*Result[csl.FSE]    `json:"foreignSanctionsEvaders" dynamodbav:"foreignSanctionsEvaders"`
-	PalestinianLegislativeCouncil          []*Result[csl.PLC]    `json:"palestinianLegislativeCouncil" dynamodbav:"palestinianLegislativeCouncil"`
-	CaptaList                              []*Result[csl.CAP]    `json:"captaList" dynamodbav:"captaList"`
-	ITARDebarred                           []*Result[csl.DTC]    `json:"itarDebarred" dynamodbav:"itarDebarred"`
-	NonSDNChineseMilitaryIndustrialComplex []*Result[csl.CMIC]   `json:"nonSDNChineseMilitaryIndustrialComplex" dynamodbav:"nonSDNChineseMilitaryIndustrialComplex"`
-	NonSDNMenuBasedSanctionsList           []*Result[csl.NS_MBS] `json:"nonSDNMenuBasedSanctionsList" dynamodbav:"nonSDNMenuBasedSanctionsList"`
+	BISEntities                            []*Result[csl.EL]     `json:"bisEntities"`
+	MilitaryEndUsers                       []*Result[csl.MEU]    `json:"militaryEndUsers"`
+	SectoralSanctions                      []*Result[csl.SSI]    `json:"sectoralSanctions"`
+	Unverified                             []*Result[csl.UVL]    `json:"unverifiedCSL"`
+	NonproliferationSanctions              []*Result[csl.ISN]    `json:"nonproliferationSanctions"`
+	ForeignSanctionsEvaders                []*Result[csl.FSE]    `json:"foreignSanctionsEvaders"`
+	PalestinianLegislativeCouncil          []*Result[csl.PLC]    `json:"palestinianLegislativeCouncil"`
+	CaptaList                              []*Result[csl.CAP]    `json:"captaList"`
+	ITARDebarred                           []*Result[csl.DTC]    `json:"itarDebarred"`
+	NonSDNChineseMilitaryIndustrialComplex []*Result[csl.CMIC]   `json:"nonSDNChineseMilitaryIndustrialComplex"`
+	NonSDNMenuBasedSanctionsList           []*Result[csl.NS_MBS] `json:"nonSDNMenuBasedSanctionsList"`
 
 	// EU - Consolidated Sanctions List
-	EUCSL []*Result[csl.EUCSLRecord] `json:"euConsolidatedSanctionsList" dynamodbav:"euConsolidatedSanctionsList"`
+	EUCSL []*Result[csl.EUCSLRecord] `json:"euConsolidatedSanctionsList"`
 
 	// UK - Consolidated Sanctions List
-	UKCSL []*Result[csl.UKCSLRecord] `json:"ukConsolidatedSanctionsList" dynamodbav:"ukConsolidatedSanctionsList"`
+	UKCSL []*Result[csl.UKCSLRecord] `json:"ukConsolidatedSanctionsList"`
+
+	// UK Sanctions List
+	UKSanctionsList []*Result[csl.UKSanctionsListRecord] `json:"ukSanctionsList"`
 
 	// Metadata
-	RefreshedAt time.Time `json:"refreshedAt" dynamodbav:"refreshedAt"`
+	RefreshedAt time.Time `json:"refreshedAt"`
 }
 
 func buildAddressCompares(req addressSearchRequest) []func(*Address) *item {
@@ -215,7 +194,7 @@ func buildAddressCompares(req addressSearchRequest) []func(*Address) *item {
 	return compares
 }
 
-func searchByAddress(logger log.Logger, searcher *searcher, req addressSearchRequest) http.HandlerFunc {
+func searchByAddress(searcher *searcher, req addressSearchRequest) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if req.empty() {
 			w.WriteHeader(http.StatusBadRequest)
@@ -250,7 +229,7 @@ func searchByAddress(logger log.Logger, searcher *searcher, req addressSearchReq
 	}
 }
 
-func searchViaQ(logger log.Logger, searcher *searcher, name string) http.HandlerFunc {
+func searchViaQ(searcher *searcher, name string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		name = strings.TrimSpace(name)
 		if name == "" {
@@ -281,7 +260,7 @@ func searchViaQ(logger log.Logger, searcher *searcher, name string) http.Handler
 type searchGather func(searcher *searcher, filters filterRequest, limit int, minMatch float64, name string, resp *searchResponse)
 
 var (
-	baseGatherings = append([]searchGather{
+	baseGatherings = []searchGather{
 		// OFAC SDN Search
 		func(s *searcher, filters filterRequest, limit int, minMatch float64, name string, resp *searchResponse) {
 			sdns := s.FindSDNsByRemarksID(limit, name)
@@ -303,7 +282,7 @@ var (
 		func(s *searcher, _ filterRequest, limit int, minMatch float64, name string, resp *searchResponse) {
 			resp.DeniedPersons = s.TopDPs(limit, minMatch, name)
 		},
-	}, cslGatherings...)
+	}
 
 	// Consolidated Screening List Results
 	cslGatherings = []searchGather{
@@ -349,14 +328,17 @@ var (
 		},
 	}
 
-	// eu - consolidated sanctions list
+	// uk - consolidated sanctions list
 	ukGatherings = []searchGather{
 		func(s *searcher, _ filterRequest, limit int, minMatch float64, name string, resp *searchResponse) {
 			resp.UKCSL = s.TopUKCSL(limit, minMatch, name)
 		},
+		func(s *searcher, _ filterRequest, limit int, minMatch float64, name string, resp *searchResponse) {
+			resp.UKSanctionsList = s.TopUKSanctionsList(limit, minMatch, name)
+		},
 	}
 
-	allGatherings = append(baseGatherings, euGatherings...)
+	allGatherings = append(append(append(baseGatherings, cslGatherings...), euGatherings...), ukGatherings...)
 )
 
 func buildFullSearchResponse(searcher *searcher, filters filterRequest, limit int, minMatch float64, name string) *searchResponse {
@@ -376,13 +358,10 @@ func buildFullSearchResponseWith(searcher *searcher, searchGatherings []searchGa
 		}(i)
 	}
 	wg.Wait()
-
-
-
 	return &resp
 }
 
-func searchViaAddressAndName(logger log.Logger, searcher *searcher, name string, req addressSearchRequest) http.HandlerFunc {
+func searchViaAddressAndName(searcher *searcher, name string, req addressSearchRequest) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		name = strings.TrimSpace(name)
 		if name == "" || req.empty() {
@@ -415,7 +394,7 @@ func searchViaAddressAndName(logger log.Logger, searcher *searcher, name string,
 	}
 }
 
-func searchByRemarksID(logger log.Logger, searcher *searcher, id string) http.HandlerFunc {
+func searchByRemarksID(searcher *searcher, id string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if id == "" {
 			moovhttp.Problem(w, errNoSearchParams)
@@ -443,7 +422,8 @@ func searchByRemarksID(logger log.Logger, searcher *searcher, id string) http.Ha
 	}
 }
 
-func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.HandlerFunc {
+// PPH MODIFIED TO ADD HIGHEST MATCH AND HIGHEST MATCH DETAILS
+func searchByName(searcher *searcher, nameSlug string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		nameSlug = strings.TrimSpace(nameSlug)
 		if nameSlug == "" {
@@ -457,9 +437,27 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 		// Grab the SDN's and then filter any out based on query params
 		sdns := searcher.TopSDNs(limit, minMatch, nameSlug, keepSDN(buildFilterRequest(r.URL)))
 
-		// record Prometheus metrics
+		// Initialize variables for HighestMatch and HighestMatchDetails
+		highestMatch := 0.0
+		highestMatchDetails := ""
+
+		// Helper function to update HighestMatch and HighestMatchDetails
+		updateHighestMatch := func(match float64, details interface{}) {
+			if match > highestMatch {
+				highestMatch = match
+				matchJSON, err := json.Marshal(details)
+				if err == nil {
+					highestMatchDetails = string(matchJSON)
+				} else {
+					highestMatchDetails = ""
+				}
+			}
+		}
+
+		// Record Prometheus metrics and update HighestMatch and HighestMatchDetails
 		if len(sdns) > 0 {
 			matchHist.With("type", "name").Observe(sdns[0].match)
+			updateHighestMatch(sdns[0].match, sdns[0])
 		} else {
 			matchHist.With("type", "name").Observe(0.0)
 		}
@@ -470,37 +468,38 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 		bisEntities := searcher.TopBISEntities(limit, minMatch, nameSlug)
 		eucsl := searcher.TopEUCSL(limit, minMatch, nameSlug)
 		ukcsl := searcher.TopUKCSL(limit, minMatch, nameSlug)
+		ukSanctionsList := searcher.TopUKSanctionsList(limit, minMatch, nameSlug)
 
-		highestMatch := 0.0
+		// Update highest match based on results from each search category
+		if len(altNames) > 0 {
+			updateHighestMatch(altNames[0].match, altNames[0])
+		}
+		if len(sectoralSanctions) > 0 {
+			updateHighestMatch(sectoralSanctions[0].match, sectoralSanctions[0])
+		}
+		if len(deniedPersons) > 0 {
+			updateHighestMatch(deniedPersons[0].match, deniedPersons[0])
+		}
+		if len(bisEntities) > 0 {
+			updateHighestMatch(bisEntities[0].match, bisEntities[0])
+		}
+		if len(eucsl) > 0 {
+			updateHighestMatch(eucsl[0].match, eucsl[0])
+		}
+		if len(ukcsl) > 0 {
+			updateHighestMatch(ukcsl[0].match, ukcsl[0])
+		}
+		if len(ukSanctionsList) > 0 {
+			updateHighestMatch(ukSanctionsList[0].match, ukSanctionsList[0])
+		}
 
-		if len(sdns) > 0 && sdns[0].match > highestMatch {
-			highestMatch = sdns[0].match
-		}
-		if len(altNames) > 0 && altNames[0].match > highestMatch {
-			highestMatch = altNames[0].match
-		}
-		if len(sectoralSanctions) > 0 && sectoralSanctions[0].match > highestMatch {
-			highestMatch = sectoralSanctions[0].match
-		}
-		if len(deniedPersons) > 0 && deniedPersons[0].match > highestMatch {
-			highestMatch = deniedPersons[0].match
-		}
-		if len(bisEntities) > 0 && bisEntities[0].match > highestMatch {
-			highestMatch = bisEntities[0].match
-		}
-		if len(eucsl) > 0 && eucsl[0].match > highestMatch {
-			highestMatch = eucsl[0].match
-		}
-		if len(ukcsl) > 0 && ukcsl[0].match > highestMatch {
-			highestMatch = ukcsl[0].match
-		}
-	
-		// PPH CHANGED
+		// Create the response with the HighestMatch and HighestMatchDetails fields
 		resp := &searchResponse{
 			// DynamoDB
-			Query: nameSlug,
-			Datetime: searcher.lastRefreshedAt.Unix(),
-			HighestMatch: highestMatch,
+			Query:              nameSlug,
+			Datetime:           searcher.lastRefreshedAt.Unix(),
+			HighestMatch:       highestMatch,
+			HighestMatchDetails: highestMatchDetails,
 			// OFAC
 			SDNs:              sdns,
 			AltNames:          altNames,
@@ -512,19 +511,20 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 			EUCSL: eucsl,
 			// UKCSL
 			UKCSL: ukcsl,
+			// UKSanctionsList
+			UKSanctionsList: ukSanctionsList,
 			// Metadata
-			RefreshedAt: searcher.lastRefreshedAt,			
+			RefreshedAt: searcher.lastRefreshedAt,
 		}
-		WriteQueryToDB(logger, *resp)
 
+		// Write the response
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
-
-		json.NewEncoder(w).Encode(&resp)
+		json.NewEncoder(w).Encode(resp)
 	}
 }
 
-func searchByAltName(logger log.Logger, searcher *searcher, altSlug string) http.HandlerFunc {
+func searchByAltName(searcher *searcher, altSlug string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		altSlug = strings.TrimSpace(altSlug)
 		if altSlug == "" {

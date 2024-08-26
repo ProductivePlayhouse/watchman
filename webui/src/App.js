@@ -1,22 +1,43 @@
+// PPH MODIFIED
 import React, { useReducer } from "react";
 import * as R from "ramda";
-import styled from "styled-components/macro"; // eslint-disable-line no-unused-vars
-import Form from "Form";
-import Results from "Results";
-import { Container } from "Components";
-import { buildQueryString, isNilOrEmpty } from "utils";
-import { search } from "api";
+import styled from 'styled-components';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { StyledEngineProvider } from '@mui/material/styles';
+import Form from "./Form";
+import Results from "./Results";
+import { Container } from "./Components";
+import { buildQueryString, isNilOrEmpty } from "./utils";
+import { search } from "./api";
 import { createBrowserHistory } from "history";
 import * as jose from "jose";
 import Cookies from "js-cookie";
+import theme from "./theme";
+import StylesProvider from "./StylesProvider";
+import { create } from 'jss';
+import { jssPreset, StylesProvider as MuiStylesProvider } from '@mui/styles';
+
+const jss = create({
+  ...jssPreset(),
+  insertionPoint: document.getElementById('jss-insertion-point'),
+});
 
 const history = createBrowserHistory();
 
-const createJWT = async (apiKey) => {
+const MarginDiv = styled.div`
+  margin: 1em auto;
+`;
+
+const StyledLink = styled.a`
+  color: #0000ee;
+`;
+
+const createJWT = async (apiKey) =>
+{
   const secret = new TextEncoder().encode(apiKey);
   const alg = "HS256";
 
-  // We set the JWT's issued at time to 1 minute ago to account for clock skew
   const time = new Date();
   time.setMinutes(time.getMinutes() - 1);
   const timeNum = time.getTime() / 1000;
@@ -34,8 +55,10 @@ const createJWT = async (apiKey) => {
   return jwt;
 };
 
-const reducer = (state, action) => {
-  switch (action.type) {
+const reducer = (state, action) =>
+{
+  switch (action.type)
+  {
     case "SEARCH_INIT":
       return R.pipe(
         R.assoc("results", null),
@@ -60,6 +83,7 @@ const reducer = (state, action) => {
       return state;
   }
 };
+
 const initialState = {
   error: null,
   loading: false,
@@ -72,34 +96,39 @@ const valuesOnlyContainLimit = R.pipe(
   R.isEmpty
 );
 
-function App() {
+function App()
+{
+  const nonce = window.cspNonce === "__CSP_NONCE__" ? null : window.cspNonce;
+
   const [state, dispatch] = useReducer(reducer, initialState);
-  const executeSearch = async (qs, apiKey) => {
+  const executeSearch = async (qs, apiKey) =>
+  {
     dispatch({ type: "SEARCH_INIT" });
-    try {
+    try
+    {
       const payload = await search(qs, apiKey);
       dispatch({ type: "SEARCH_SUCCESS", payload });
-    } catch (err) {
+    } catch (err)
+    {
       dispatch({ type: "SEARCH_ERROR", payload: err });
     }
   };
 
-  const handleReset = () => {
+  const handleReset = () =>
+  {
     dispatch({ type: "SEARCH_RESET" });
     history.push({ ...history.location, search: "" });
   };
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values) =>
+  {
     if (valuesOnlyContainLimit(values)) return;
 
-    // Extract API key from values and include in a token
     const apiKey = values.apiKey;
     const token = await createJWT(apiKey);
 
-    // Save the token to a cookie
     Cookies.set("token", token, { expires: 1 });
 
-    // Create a version of values that does not include apiKey
     const valuesWithoutApiKey = R.omit(["apiKey"], values);
 
     const qs = buildQueryString(valuesWithoutApiKey);
@@ -108,51 +137,40 @@ function App() {
   };
 
   return (
-    <div
-      css={`
-        width: 80vw;
-        margin: 1em auto;
-      `}
-    >
-      <Container>
-        <h1>PPH Watchman</h1>
-        <p>
-          PPH Watchman is a service which downloads, parses and indexes numerous trade, government
-          and non-profit lists of blocked individuals and entities to comply with those regions
-          laws.
-        </p>
-        <p>
-          <a
-            css={`
-              color: #0000ee;
-            `}
-            href="https://github.com/SecurityPPH/watchman"
-          >
-            GitHub
-          </a>{" "}
-          |&nbsp;
-          <a
-            css={`
-              color: #0000ee;
-            `}
-            href="https://moov-io.github.io/watchman/"
-          >
-            Documentation
-          </a>{" "}
-          |&nbsp;
-          <a
-            css={`
-              color: #0000ee;
-            `}
-            href="https://moov-io.github.io/watchman/api/"
-          >
-            API Endpoints
-          </a>
-        </p>
-      </Container>
-      <Form onSubmit={handleSubmit} onReset={handleReset} />
-      <Results data={state} />
-    </div>
+    <StylesProvider>
+      <MuiStylesProvider jss={jss} nonce={nonce}>
+        <StyledEngineProvider injectFirst>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Container maxWidth="lg">
+              <MarginDiv>
+                <h1>PPH Watchman</h1>
+                <p>
+                  PPH Watchman is a service which downloads, parses and indexes numerous trade, government
+                  and non-profit lists of blocked individuals and entities to comply with those regions
+                  laws.
+                </p>
+                <p>
+                  <StyledLink href="https://github.com/SecurityPPH/watchman">
+                    GitHub
+                  </StyledLink>{" "}
+                  |{" "}
+                  <StyledLink href="https://moov-io.github.io/watchman/">
+                    Documentation
+                  </StyledLink>{" "}
+                  |{" "}
+                  <StyledLink href="https://moov-io.github.io/watchman/api/">
+                    API Endpoints
+                  </StyledLink>
+                </p>
+              </MarginDiv>
+              <Form onSubmit={handleSubmit} onReset={handleReset} />
+              <Results data={state} />
+            </Container>
+          </ThemeProvider>
+        </StyledEngineProvider>
+      </MuiStylesProvider>
+    </StylesProvider>
   );
 }
 

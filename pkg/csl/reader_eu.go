@@ -5,26 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"strconv"
 )
 
-func ReadEUFile(path string) ([]*EUCSLRecord, EUCSL, error) {
-	fd, err := os.Open(path)
-	if err != nil {
-		return nil, nil, err
+func ParseEU(r io.ReadCloser) ([]*EUCSLRecord, EUCSL, error) {
+	if r == nil {
+		return nil, nil, errors.New("EU CSL file is empty or missing")
 	}
-	defer fd.Close()
-
-	rows, rowsMap, err := ParseEU(fd)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return rows, rowsMap, nil
-}
-
-func ParseEU(r io.Reader) ([]*EUCSLRecord, EUCSL, error) {
+	defer r.Close()
 	reader := csv.NewReader(r)
 	// sets comma delim to ; and ignores " in non quoted field and size of columns
 	// https://stackoverflow.com/questions/31326659/golang-csv-error-bare-in-non-quoted-field
@@ -35,7 +23,7 @@ func ParseEU(r io.Reader) ([]*EUCSLRecord, EUCSL, error) {
 	report := make(EUCSL)
 	_, err := reader.Read()
 	if err != nil {
-		fmt.Println("failed to read csv: ", err)
+		return nil, report, fmt.Errorf("failed to read csv: %w", err)
 	}
 	for {
 		record, err := reader.Read()
@@ -54,7 +42,6 @@ func ParseEU(r io.Reader) ([]*EUCSLRecord, EUCSL, error) {
 		}
 
 		if len(record) <= 1 {
-			fmt.Println("record is <= 1", record)
 			continue // skip empty records
 		}
 
@@ -74,7 +61,7 @@ func ParseEU(r io.Reader) ([]*EUCSLRecord, EUCSL, error) {
 		}
 
 	}
-	var totalReport []*EUCSLRecord
+	totalReport := make([]*EUCSLRecord, 0, len(report))
 	for _, row := range report {
 		totalReport = append(totalReport, row)
 	}
